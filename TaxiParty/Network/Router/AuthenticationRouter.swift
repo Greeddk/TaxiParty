@@ -20,7 +20,7 @@ enum AuthenticationRouter {
     case withdraw
 }
 
-extension AuthenticationRouter: TargetType {
+extension AuthenticationRouter: RouterType {
     
     var baseURL: String {
         return APIKey.baseURL.rawValue

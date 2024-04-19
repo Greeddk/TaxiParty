@@ -12,7 +12,7 @@ enum PostRouter {
     case fetchPost(query: String)
 }
 
-extension PostRouter: TargetType {
+extension PostRouter: RouterType {
 
     var baseURL: String {
         return APIKey.baseURL.rawValue

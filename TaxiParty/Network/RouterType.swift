@@ -8,7 +8,7 @@
 import Foundation
 import Alamofire
 
-protocol TargetType: URLRequestConvertible {
+protocol RouterType: URLRequestConvertible {
     
     var baseURL: String { get }
     var method: HTTPMethod { get }
@@ -19,7 +19,7 @@ protocol TargetType: URLRequestConvertible {
     var body: Data? { get }
 }
 
-extension TargetType {
+extension RouterType {
     
     func asURLRequest() throws -> URLRequest {
         let url = try baseURL.asURL()

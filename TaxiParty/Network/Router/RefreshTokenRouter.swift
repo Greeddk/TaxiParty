@@ -12,7 +12,7 @@ enum refreshTokenRouter {
     case refreshToken
 }
 
-extension refreshTokenRouter: TargetType {
+extension refreshTokenRouter: RouterType {
 
     var baseURL: String {
         return APIKey.baseURL.rawValue

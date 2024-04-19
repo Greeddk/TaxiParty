@@ -22,12 +22,12 @@ enum NetworkError: Error {
 final class NetworkManager {
     static let shared = NetworkManager()
     
-    func callRequest<T>(type: T.Type, router: TargetType) -> Single<Result<T, NetworkError>> where T: Decodable {
+    func callRequest<T>(type: T.Type, router: RouterType) -> Single<Result<T, NetworkError>> where T: Decodable {
         return Single.create { single -> Disposable in
             
             do {
                 let urlRequest = try router.asURLRequest()
-                AF.request(urlRequest)
+                AF.request(urlRequest, interceptor: AuthInterceptor())
                     .validate(statusCode: 200..<300)
                     .responseDecodable(of: T.self) { response in
                         switch response.result {
@@ -57,6 +57,33 @@ final class NetworkManager {
                 single(.failure(error))
             }
             return Disposables.create()
+        }
+    }
+    
+}
+
+final class AuthInterceptor: RequestInterceptor {
+    
+    func retry(_ request: Request, for session: Session, dueTo error: any Error, completion: @escaping (RetryResult) -> Void) {
+        guard let response = request.task?.response as? HTTPURLResponse, response.statusCode == 419 else {
+            completion(.doNotRetryWithError(error))
+            return
+        }
+        
+        do {
+            let urlRequest = try refreshTokenRouter.refreshToken.asURLRequest()
+            AF.request(urlRequest)
+                .validate(statusCode: 200..<300)
+                .responseDecodable(of: RefreshTokenModel.self) { response in
+                    switch response.result {
+                    case .success(let success):
+                        TokenManager.accessToken = success.accessToken
+                    case .failure(let error):
+                        print(error)
+                    }
+                }
+        } catch {
+            print(error)
         }
     }
     

@@ -12,7 +12,7 @@ enum APIRouter {
     case refreshTokenRouter(refreshTokenRouter)
     case postRouter(PostRouter)
     
-    func convertToURLRequest() -> TargetType {
+    func convertToURLRequest() -> RouterType {
         switch self {
         case .authenticationRouter(let authenticationRouter):
             return authenticationRouter
