@@ -33,7 +33,6 @@ final class NetworkManager {
                         switch response.result {
                         case .success(let success):
                             single(.success(.success(success)))
-                            print(success)
                         case .failure(let error):
                             print(error)
                             let networkError: NetworkError

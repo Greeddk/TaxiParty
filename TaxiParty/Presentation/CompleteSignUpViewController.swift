@@ -11,7 +11,6 @@ final class CompleteSignUpViewController: BaseViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
         
     }
 
