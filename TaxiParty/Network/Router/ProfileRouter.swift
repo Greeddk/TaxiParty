@@ -1,18 +1,18 @@
 //
-//  PostRouter.swift
+//  ProfileRouter.swift
 //  TaxiParty
 //
-//  Created by Greed on 4/15/24.
+//  Created by Greed on 4/19/24.
 //
 
 import Foundation
 import Alamofire
 
-enum PostRouter {
-    case fetchPost(query: String)
+enum ProfileRouter {
+    case fetchProfile
 }
 
-extension PostRouter: RouterType {
+extension ProfileRouter: RouterType {
 
     var baseURL: String {
         return APIKey.baseURL.rawValue
@@ -20,21 +20,21 @@ extension PostRouter: RouterType {
     
     var method: Alamofire.HTTPMethod {
         switch self {
-        case .fetchPost:
+        case .fetchProfile:
             return .get
         }
     }
     
     var path: String {
         switch self {
-        case .fetchPost:
-            return "/v1/posts"
+        case .fetchProfile:
+            return "/v1/users/me/profile"
         }
     }
     
     var header: [String : String] {
         switch self {
-        case .fetchPost:
+        case .fetchProfile:
             return [HTTPHeader.authorization.rawValue: TokenManager.accessToken, HTTPHeader.sesacKey.rawValue: APIKey.sesacKey.rawValue]
         }
     }
@@ -49,10 +49,8 @@ extension PostRouter: RouterType {
     
     var body: Data? {
         switch self {
-        case .fetchPost(let query):
-            let encoder = JSONEncoder()
-            encoder.keyEncodingStrategy = .convertToSnakeCase
-            return try? encoder.encode(query)
+        case .fetchProfile:
+            return nil
         }
     }
 }

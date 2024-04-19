@@ -7,18 +7,18 @@
 
 import Foundation
 
-struct LoginQuery: Encodable {
+struct LoginQuery: HTTPBodyProtocol {
     let email: String
     let password: String
 }
 
-struct joinQuery: Encodable {
+struct joinQuery: HTTPBodyProtocol {
     let email: String
     let password: String
     let nick: String
     let phoneNum: String
 }
 
-struct validationEmail: Encodable {
+struct validationEmail: HTTPBodyProtocol {
     let email: String
 }

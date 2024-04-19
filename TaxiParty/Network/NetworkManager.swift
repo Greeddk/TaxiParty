@@ -17,6 +17,7 @@ enum NetworkError: Error {
     case invalidSesacKey
     case overCalling
     case invalidRequest
+    case expireRefreshToken
 }
 
 final class NetworkManager {
@@ -39,6 +40,8 @@ final class NetworkManager {
                             switch error.responseCode {
                             case 409:
                                 networkError = .cantUseIt
+                            case 418:
+                                networkError = .expireRefreshToken
                             case 420:
                                 networkError = .invalidSesacKey
                             case 429:
@@ -63,6 +66,20 @@ final class NetworkManager {
 }
 
 final class AuthInterceptor: RequestInterceptor {
+
+    func adapt(_ urlRequest: URLRequest, for session: Session, completion: @escaping (Result<URLRequest, any Error>) -> Void) {
+        let accessToken = TokenManager.accessToken
+        if accessToken == urlRequest.headers.dictionary[HTTPHeader.authorization.rawValue] {
+            completion(.success(urlRequest))
+        } else {
+            var urlRequest = urlRequest
+            urlRequest.setValue(TokenManager.accessToken, forHTTPHeaderField: HTTPHeader.authorization.rawValue)
+            
+            print("새 accessToken 적용 \(urlRequest.headers)")
+            completion(.success(urlRequest))
+        }
+        
+    }
     
     func retry(_ request: Request, for session: Session, dueTo error: any Error, completion: @escaping (RetryResult) -> Void) {
         guard let response = request.task?.response as? HTTPURLResponse, response.statusCode == 419 else {
@@ -78,8 +95,10 @@ final class AuthInterceptor: RequestInterceptor {
                     switch response.result {
                     case .success(let success):
                         TokenManager.accessToken = success.accessToken
+                        completion(.retry)
                     case .failure(let error):
                         print(error)
+                        completion(.doNotRetryWithError(NetworkError.expireRefreshToken))
                     }
                 }
         } catch {

@@ -35,9 +35,9 @@ extension refreshTokenRouter: RouterType {
     var header: [String : String] {
         switch self {
         case .refreshToken:
-            return [HTTPHeader.authorization.rawValue: UserDefaults.standard.string(forKey: Token.accessToken.rawValue)!,
+            return [HTTPHeader.authorization.rawValue: TokenManager.accessToken,
                     HTTPHeader.sesacKey.rawValue: APIKey.sesacKey.rawValue,
-                    HTTPHeader.refresh.rawValue: UserDefaults.standard.string(forKey: Token.refreshToken.rawValue)!
+                    HTTPHeader.refresh.rawValue: TokenManager.refreshToken
             ]
         }
     }

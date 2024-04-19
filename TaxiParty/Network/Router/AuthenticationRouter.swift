@@ -61,7 +61,7 @@ extension AuthenticationRouter: RouterType {
         case .validationEmail:
             return [HTTPHeader.contentType.rawValue: HTTPHeader.json.rawValue, HTTPHeader.sesacKey.rawValue: APIKey.sesacKey.rawValue]
         case .withdraw:
-            return [HTTPHeader.authorization.rawValue: UserDefaults.standard.string(forKey: Token.accessToken.rawValue)!, HTTPHeader.sesacKey.rawValue: APIKey.sesacKey.rawValue]
+            return [HTTPHeader.authorization.rawValue: TokenManager.accessToken, HTTPHeader.sesacKey.rawValue: APIKey.sesacKey.rawValue]
         }
     }
     
