@@ -95,6 +95,7 @@ final class SignUpViewModel {
                     hidePasswordTextFieldTrigger.accept(false)
                 case .failure(let error):
                     print(error)
+                    
                     descriptionText.accept("중복된 이메일이에요")
                     hidePasswordTextFieldTrigger.accept(true)
                 }
