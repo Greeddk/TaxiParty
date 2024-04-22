@@ -8,6 +8,7 @@
 import UIKit
 import SwiftUI
 
+
 struct NearMapRepresentableView: UIViewControllerRepresentable {
 
     func makeUIViewController(context: Context) -> some UIViewController {
@@ -21,16 +22,18 @@ struct NearMapRepresentableView: UIViewControllerRepresentable {
 }
 
 final class NearMapViewController: BaseViewController {
+    
+    let mainView = NearMapView()
+    
+    override func loadView() {
+        self.view = mainView
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        let label = UILabel()
-        view.addSubview(label)
-        label.snp.makeConstraints { make in
-            make.center.equalTo(view)
-        }
-        label.text = "map이라고 생각하셈"
+        
     }
     
 }
+
+
