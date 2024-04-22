@@ -7,12 +7,13 @@
 
 import Foundation
 
+
 struct LoginQuery: HTTPBodyProtocol {
     let email: String
     let password: String
 }
 
-struct joinQuery: HTTPBodyProtocol {
+struct JoinQuery: HTTPBodyProtocol {
     let email: String
     let password: String
     let nick: String

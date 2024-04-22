@@ -15,7 +15,7 @@ enum Token: String {
 
 enum AuthenticationRouter {
     case login(query: LoginQuery)
-    case join(query: joinQuery)
+    case join(query: JoinQuery)
     case validationEmail(query: validationEmail)
     case withdraw
 }
@@ -81,7 +81,7 @@ extension AuthenticationRouter: RouterType {
             return try? encoder.encode(query)
         case .join(let query):
             let encoder = JSONEncoder()
-            encoder.keyEncodingStrategy = .convertToSnakeCase
+            encoder.keyEncodingStrategy = .useDefaultKeys
             return try? encoder.encode(query)
         case .validationEmail(let query):
             let encoder = JSONEncoder()

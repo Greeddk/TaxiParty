@@ -75,7 +75,7 @@ extension NearMapView: CLLocationManagerDelegate {
         
         switch status {
         case .notDetermined:
-            locationManager.desiredAccuracy = kCLLocationAccuracyBest
+            locationManager.desiredAccuracy = kCLLocationAccuracyBestForNavigation
             locationManager.requestWhenInUseAuthorization()
         case .restricted:
             print("restricted")

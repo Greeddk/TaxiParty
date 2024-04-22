@@ -49,14 +49,14 @@ final class SignUpViewModel {
         
         let SignUpObservable = Observable.combineLatest(input.emailText, input.passwordText, input.nicknameText, input.phoneNumText)
             .map { email, password, nick, phoneNum in
-                return SignUpQuery(email: email, password: password, nick: nick, phoneNum: phoneNum)
+                return JoinQuery(email: email, password: password, nick: nick, phoneNum: phoneNum)
             }
         
         Observable.merge(input.phoneNumTextReturned, input.nextButtonTapped)
             .withLatestFrom(SignUpObservable)
-            .flatMap { signUpQuery in
-                return NetworkManager.shared.callRequest(type: SignUpModel.self, router: APIRouter.authenticationRouter(.join(query: joinQuery(email: signUpQuery.email, password: signUpQuery.password, nick: signUpQuery.nick, phoneNum: signUpQuery.phoneNum))).convertToURLRequest())
-            }
+            .flatMap { join in
+                return NetworkManager.shared.callRequest(type: SignUpModel.self, router: APIRouter.authenticationRouter(.join(query: JoinQuery(email: join.email, password: join.password, nick: join.nick, phoneNum: join.phoneNum))).convertToURLRequest())
+            }.debug()
             .bind(with: self) { owner, value in
                 switch value {
                 case .success(let success):
@@ -132,7 +132,7 @@ final class SignUpViewModel {
         
         input.phoneNumText
             .bind(with: self) { owner, value in
-                if value.count > 11 {
+                if value.count == 11 {
                     nextButtonAppearTrigger.accept(false)
                 } else {
                     nextButtonAppearTrigger.accept(true)
@@ -152,9 +152,4 @@ final class SignUpViewModel {
     
 }
 
-struct SignUpQuery {
-    let email: String
-    let password: String
-    let nick: String
-    let phoneNum: String
-}
+

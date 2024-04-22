@@ -18,6 +18,7 @@ enum NetworkError: Error {
     case overCalling
     case invalidRequest
     case expireRefreshToken
+    case invalidToken
 }
 
 final class NetworkManager {
@@ -38,6 +39,8 @@ final class NetworkManager {
                             print(error)
                             let networkError: NetworkError
                             switch error.responseCode {
+                            case 401:
+                                networkError = .invalidToken
                             case 409:
                                 networkError = .cantUseIt
                             case 418:

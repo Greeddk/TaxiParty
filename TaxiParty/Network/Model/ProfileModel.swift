@@ -11,7 +11,7 @@ struct ProfileModel: Decodable {
     let user_id: String
     let email: String
     let nick: String
-//    let phoneNum: String
+    let phoneNum: String?
     let profileImage: String?
     let posts: [String]?
 }
