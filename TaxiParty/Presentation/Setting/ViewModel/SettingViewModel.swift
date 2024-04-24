@@ -16,10 +16,12 @@ final class SettingViewModel {
     struct Input {
         let fetchProfile: Observable<Void>
         let withdrawButtonTapped: Observable<Void>
+        let withdrawTrigger: Observable<Void>
     }
     
     struct Output {
         let profileInfo: Driver<ProfileModel>
+        let showAlertTrigger: Driver<Void>
         let withdrawComplete: Driver<Void>
     }
     
@@ -49,7 +51,7 @@ final class SettingViewModel {
             }
             .disposed(by: disposeBag)
         
-        input.withdrawButtonTapped
+        input.withdrawTrigger
             .flatMap {
                 return NetworkManager.shared.callRequest(type: WithdrawModel.self, router: APIRouter.authenticationRouter(.withdraw).convertToURLRequest())
             }
@@ -73,7 +75,7 @@ final class SettingViewModel {
         
         
         let errorModel = ProfileModel(user_id: "", email: "", nick: "error", phoneNum: "", profileImage: "", posts: nil)
-        return Output(profileInfo: profileInfo.asDriver(onErrorJustReturn: errorModel), withdrawComplete: withdrawComplete.asDriver(onErrorJustReturn: ()))
+        return Output(profileInfo: profileInfo.asDriver(onErrorJustReturn: errorModel), showAlertTrigger: input.withdrawButtonTapped.asDriver(onErrorJustReturn: ()), withdrawComplete: withdrawComplete.asDriver(onErrorJustReturn: ()))
     }
     
 }

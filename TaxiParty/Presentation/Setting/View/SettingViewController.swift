@@ -40,13 +40,23 @@ final class SettingViewController: BaseViewController {
     
     override func bind() {
         
-        let input = SettingViewModel.Input(fetchProfile: viewDidLoadTrigger.asObservable(), withdrawButtonTapped: mainView.withdrawButton.rx.tap.asObservable())
+        let withdrawTrigger = PublishRelay<Void>()
+        
+        let input = SettingViewModel.Input(fetchProfile: viewDidLoadTrigger.asObservable(), withdrawButtonTapped: mainView.withdrawButton.rx.tap.asObservable(), withdrawTrigger: withdrawTrigger.asObservable())
         
         let output = viewModel.transform(input: input)
         
         output.profileInfo
             .drive(with: self) { owner, value in
                 owner.mainView.configureView(profile: value)
+            }
+            .disposed(by: disposeBag)
+        
+        output.showAlertTrigger
+            .drive(with: self) { owner, _ in
+                owner.showAlert {
+                    withdrawTrigger.accept(())
+                }
             }
             .disposed(by: disposeBag)
         
