@@ -28,7 +28,7 @@ final class SearchPostView: BaseView {
     override func setupLayout() {
         collectionView.snp.makeConstraints { make in
             make.top.horizontalEdges.equalTo(self.safeAreaLayoutGuide)
-            make.bottom.equalTo(self.safeAreaLayoutGuide).offset(-50)
+            make.bottom.equalTo(self.safeAreaLayoutGuide).offset(-30)
         }
     }
     

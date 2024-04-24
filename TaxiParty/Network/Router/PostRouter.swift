@@ -51,7 +51,6 @@ extension PostRouter: RouterType {
         switch self {
         case .fetchPost(let query):
             let encoder = JSONEncoder()
-            encoder.keyEncodingStrategy = .convertToSnakeCase
             return try? encoder.encode(query)
         }
     }

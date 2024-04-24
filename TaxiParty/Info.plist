@@ -6,10 +6,10 @@
 	<string>위치정보 권한이 필요합니다.</string>
 	<key>NSLocationAlwaysUsageDescription</key>
 	<string>위치정보 권한이 필요합니다.</string>
-	<key>NSLocationDefaultAccuracyReduced</key>
-	<true/>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>위치정보 권한이 필요합니다.</string>
+	<key>NSLocationDefaultAccuracyReduced</key>
+	<false/>
 	<key>NMFClientId</key>
 	<string>$(NMFClientId)</string>
 	<key>NSAppTransportSecurity</key>
