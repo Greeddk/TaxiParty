@@ -9,7 +9,7 @@ import UIKit
 import SnapKit
 
 final class BottomSheetView: PassThroughView {
-    // MARK: Constants
+
     enum Mode {
         case tip
         case full
@@ -30,17 +30,17 @@ final class BottomSheetView: PassThroughView {
         }
     }
     
-    // MARK: UI
     let bottomSheetView = ConfigurePostView()
     let addressLabel = UILabel()
     
-    // MARK: Properties
-    var mode: Mode = .tip {
+    lazy var mode: Mode = .tip {
         didSet {
             switch self.mode {
             case .tip:
+                self.bottomSheetView.backButton.isHidden = true
                 break
             case .full:
+                self.bottomSheetView.backButton.isHidden = false
                 break
             }
             self.updateConstraint(offset: Const.bottomSheetYPosition(self.mode))
@@ -50,7 +50,6 @@ final class BottomSheetView: PassThroughView {
         didSet { self.bottomSheetView.backgroundColor = self.bottomSheetColor }
     }
     
-    // MARK: Initializer
     @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init() has not been implemented")
@@ -58,9 +57,11 @@ final class BottomSheetView: PassThroughView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
+        self.layer.shadowRadius = 1
+        self.layer.shadowOpacity = 0.2
+        self.layer.shadowOffset = CGSize.zero
+        
         self.backgroundColor = .clear
-        let panGesture = UIPanGestureRecognizer(target: self, action: #selector(didPan))
-        self.addGestureRecognizer(panGesture)
         
         self.bottomSheetView.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
         self.bottomSheetView.layer.cornerRadius = Const.cornerRadius
@@ -73,34 +74,18 @@ final class BottomSheetView: PassThroughView {
             $0.top.equalTo(Const.bottomSheetYPosition(.tip))
             $0.bottom.equalTo(keyboardLayoutGuide)
         }
-    
+        
+        self.bottomSheetView.destinationTextField.delegate = self
+        self.bottomSheetView.backButton.addTarget(self, action: #selector(backButtonTapped), for: .touchUpInside)
     }
     
-    // MARK: Methods
-    @objc private func didPan(_ recognizer: UIPanGestureRecognizer) {
-        let translationY = recognizer.translation(in: self).y
-        let minY = self.bottomSheetView.frame.minY
-        let offset = translationY + minY
-        
-        if Const.bottomSheetYPosition(.full)...Const.bottomSheetYPosition(.tip) ~= offset {
-            self.updateConstraint(offset: offset)
-            recognizer.setTranslation(.zero, in: self)
-        }
-        UIView.animate(
-            withDuration: 0,
-            delay: 0,
-            options: .curveEaseOut,
-            animations: self.layoutIfNeeded,
-            completion: nil
-        )
-        
-        guard recognizer.state == .ended else { return }
+    @objc private func backButtonTapped(sender: UIButton) {
         UIView.animate(
             withDuration: Const.duration,
             delay: 0,
             options: .allowAnimatedContent,
             animations: {
-                self.mode = recognizer.velocity(in: self).y >= 0 ? Mode.tip : .full
+                self.mode = .tip
             },
             completion: nil
         )
@@ -112,4 +97,18 @@ final class BottomSheetView: PassThroughView {
             $0.top.equalToSuperview().inset(offset)
         }
     }
+}
+
+extension BottomSheetView: UITextFieldDelegate {
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+           UIView.animate(
+               withDuration: Const.duration,
+               delay: 0,
+               options: .allowAnimatedContent,
+               animations: {
+                   self.mode = .full
+               },
+               completion: nil
+           )
+       }
 }
