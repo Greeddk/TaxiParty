@@ -27,6 +27,7 @@ extension RouterType {
         urlRequest.allHTTPHeaderFields = header
         urlRequest.httpBody = parameters?.data(using: .utf8)
         urlRequest.httpBody = body
+        urlRequest.url?.append(queryItems: queryItem ?? [])
         return urlRequest
     }
 }

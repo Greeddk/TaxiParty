@@ -66,6 +66,49 @@ final class NetworkManager {
         }
     }
     
+    func callGeocodingRequest<T>(type: T.Type, router: RouterType) -> Single<Result<T, NetworkError>> where T: Decodable {
+        return Single.create { single -> Disposable in
+            
+            do {
+                let urlRequest = try router.asURLRequest()
+                print(urlRequest)
+                AF.request(urlRequest)
+                    .validate(statusCode: 200..<300)
+                    .responseDecodable(of: T.self) { response in
+                        switch response.result {
+                        case .success(let success):
+                            single(.success(.success(success)))
+                        case .failure(let error):
+                            print(error)
+                            let networkError: NetworkError
+                            switch error.responseCode {
+                            case 401:
+                                networkError = .invalidToken
+                            case 409:
+                                networkError = .cantUseIt
+                            case 418:
+                                networkError = .expireRefreshToken
+                            case 420:
+                                networkError = .invalidSesacKey
+                            case 429:
+                                networkError = .overCalling
+                            case 444:
+                                networkError = .invalidURL
+                            case 500:
+                                networkError = .invalidRequest
+                            default:
+                                networkError = .failedRequest
+                            }
+                            single(.success(.failure(networkError)))
+                        }
+                    }
+            } catch {
+                single(.failure(error))
+            }
+            return Disposables.create()
+        }
+    }
+    
 }
 
 final class AuthInterceptor: RequestInterceptor {

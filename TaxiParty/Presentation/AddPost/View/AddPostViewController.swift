@@ -26,12 +26,15 @@ struct AddPostRepresentableView: UIViewControllerRepresentable {
 final class AddPostViewController: BaseViewController {
     
     let mainView = AddPostView()
+    let viewModel = AddPostViewModel()
+    
     private let bottomSheetView: BottomSheetView = {
         let view = BottomSheetView()
         view.bottomSheetColor = .white
         return view
     }()
-    let modalView = ConfigurePostViewController()
+    
+    let coordinate = PublishRelay<String>()
     
     override func loadView() {
         self.view = mainView
@@ -41,6 +44,21 @@ final class AddPostViewController: BaseViewController {
         super.viewDidLoad()
         configureBottomSheet()
         setAttribute()
+        hideKeyboardWhenViewIsTapped()
+    }
+    
+    override func bind() {
+        
+        let currentPosition = "\(mainView.currentPosition.lng),\(mainView.currentPosition.lat)"
+        coordinate.accept(currentPosition)
+        
+        let input = AddPostViewModel.Input(coordinate: coordinate.asObservable())
+        
+        let output = viewModel.transform(input: input)
+        
+        output.startPoint
+            .drive(bottomSheetView.bottomSheetView.startPointTextField.rx.text).disposed(by: disposeBag)
+
     }
     
     private func configureBottomSheet() {
@@ -67,6 +85,12 @@ extension AddPostViewController: NMFMapViewCameraDelegate {
         let camPosition = mapView.cameraPosition
         mainView.startPointMarker.position = camPosition.target
     }
+    
+    func mapViewCameraIdle(_ mapView: NMFMapView) {
+        let camposition = "\(mapView.cameraPosition.target.lng),\(mapView.cameraPosition.target.lat)"
+        coordinate.accept(camposition)
+    }
+    
 }
 
 
