@@ -14,4 +14,6 @@ enum HTTPHeader: String {
     case contentType = "Content-Type"
     case json = "application/json"
     case multipart = "multipart/form-data"
+    case naverClientId = "X-NCP-APIGW-API-KEY-ID"
+    case naverClinetSecret = "X-NCP-APIGW-API-KEY"
 }

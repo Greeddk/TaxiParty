@@ -77,7 +77,6 @@ extension AuthenticationRouter: RouterType {
         switch self {
         case .login(let query):
             let encoder = JSONEncoder()
-            encoder.keyEncodingStrategy = .convertToSnakeCase
             return try? encoder.encode(query)
         case .join(let query):
             let encoder = JSONEncoder()
@@ -85,7 +84,6 @@ extension AuthenticationRouter: RouterType {
             return try? encoder.encode(query)
         case .validationEmail(let query):
             let encoder = JSONEncoder()
-            encoder.keyEncodingStrategy = .convertToSnakeCase
             return try? encoder.encode(query)
         case .withdraw:
             return nil

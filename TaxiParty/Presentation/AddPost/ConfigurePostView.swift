@@ -28,10 +28,22 @@ final class ConfigurePostView: BaseView {
         $0.font = .Spoqa(size: 16, weight: .regular)
         $0.placeholder = "어디로 갈까요?"
     }
-    let tableView = UITableView()
+    let dividerView = UIView().then {
+        $0.backgroundColor = .systemGray6
+        $0.isHidden = true
+    }
+    let headerLabel = UILabel().then {
+        $0.text = "장소결과"
+        $0.font = .Spoqa(size: 14, weight: .regular)
+        $0.textColor = .systemGray3
+        $0.isHidden = true
+    }
+    let tableView = UITableView().then {
+        $0.isHidden = true
+    }
 
     override func setHierarchy() {
-        addSubViews(views: [backButton, startPointTextField, intervalLine, destinationTextField, tableView])
+        addSubViews(views: [backButton, startPointTextField, intervalLine, destinationTextField, dividerView, headerLabel, tableView])
     }
     
     override func setupLayout() {
@@ -44,23 +56,37 @@ final class ConfigurePostView: BaseView {
             make.top.equalTo(self.safeAreaLayoutGuide).offset(30)
             make.left.equalTo(self).offset(30)
             make.horizontalEdges.equalTo(self).inset(20)
-            make.height.equalTo(60)
+            make.height.equalTo(50)
         }
         intervalLine.snp.makeConstraints { make in
             make.top.equalTo(startPointTextField.snp.bottom)
-            make.horizontalEdges.equalTo(startPointTextField).inset(10)
+            make.horizontalEdges.equalTo(startPointTextField).inset(24)
             make.height.equalTo(1)
         }
         destinationTextField.snp.makeConstraints { make in
             make.top.equalTo(startPointTextField.snp.bottom)
             make.left.equalTo(startPointTextField)
             make.horizontalEdges.equalTo(startPointTextField)
-            make.height.equalTo(60)
+            make.height.equalTo(50)
+        }
+        dividerView.snp.makeConstraints { make in
+            make.top.equalTo(destinationTextField.snp.bottom).offset(30)
+            make.width.equalTo(self)
+            make.height.equalTo(8)
+        }
+        headerLabel.snp.makeConstraints { make in
+            make.top.equalTo(dividerView.snp.bottom).offset(20)
+            make.leading.equalTo(15)
         }
         tableView.snp.makeConstraints { make in
-            make.top.equalTo(destinationTextField.snp.bottom).offset(4)
+            make.top.equalTo(headerLabel.snp.bottom).offset(10)
             make.horizontalEdges.equalTo(self)
-            make.bottom.equalTo(self)
+            make.bottom.equalTo(self).offset(-85)
         }
+    }
+    
+    override func setupAttributes() {
+        tableView.showsVerticalScrollIndicator = false
+        tableView.register(SearchedAddressTableViewCell.self, forCellReuseIdentifier: SearchedAddressTableViewCell.identifier)
     }
 }

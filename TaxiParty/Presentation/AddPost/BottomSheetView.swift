@@ -9,11 +9,12 @@ import UIKit
 import SnapKit
 
 final class BottomSheetView: PassThroughView {
-
+    
     enum Mode {
         case tip
         case full
     }
+    
     private enum Const {
         static let duration = 0.5
         static let cornerRadius = 20.0
@@ -38,9 +39,15 @@ final class BottomSheetView: PassThroughView {
             switch self.mode {
             case .tip:
                 self.bottomSheetView.backButton.isHidden = true
+                self.bottomSheetView.dividerView.isHidden = true
+                self.bottomSheetView.headerLabel.isHidden = true
+                self.bottomSheetView.tableView.isHidden = true
                 break
             case .full:
                 self.bottomSheetView.backButton.isHidden = false
+                self.bottomSheetView.dividerView.isHidden = false
+                self.bottomSheetView.headerLabel.isHidden = false
+                self.bottomSheetView.tableView.isHidden = false
                 break
             }
             self.updateConstraint(offset: Const.bottomSheetYPosition(self.mode))
@@ -54,6 +61,7 @@ final class BottomSheetView: PassThroughView {
     required init?(coder: NSCoder) {
         fatalError("init() has not been implemented")
     }
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         
@@ -75,7 +83,8 @@ final class BottomSheetView: PassThroughView {
             $0.bottom.equalTo(keyboardLayoutGuide)
         }
         
-        self.bottomSheetView.destinationTextField.delegate = self
+        self.bottomSheetView.startPointTextField.addTarget(self, action: #selector(textFieldTapped), for: .editingDidBegin)
+        self.bottomSheetView.destinationTextField.addTarget(self, action: #selector(textFieldTapped), for: .editingDidBegin)
         self.bottomSheetView.backButton.addTarget(self, action: #selector(backButtonTapped), for: .touchUpInside)
     }
     
@@ -91,24 +100,23 @@ final class BottomSheetView: PassThroughView {
         )
     }
     
+    @objc private func textFieldTapped(sender: UITextField) {
+        UIView.animate(
+            withDuration: Const.duration,
+            delay: 0,
+            options: .allowAnimatedContent,
+            animations: {
+                self.mode = .full
+            },
+            completion: nil
+        )
+    }
+    
     private func updateConstraint(offset: Double) {
         self.bottomSheetView.snp.remakeConstraints {
             $0.left.right.bottom.equalToSuperview()
             $0.top.equalToSuperview().inset(offset)
         }
     }
-}
-
-extension BottomSheetView: UITextFieldDelegate {
-    func textFieldDidBeginEditing(_ textField: UITextField) {
-           UIView.animate(
-               withDuration: Const.duration,
-               delay: 0,
-               options: .allowAnimatedContent,
-               animations: {
-                   self.mode = .full
-               },
-               completion: nil
-           )
-       }
+    
 }

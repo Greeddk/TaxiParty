@@ -20,7 +20,7 @@ class AddressTextField: UITextField {
     }
     
     private func setTextField() {
-        self.layer.cornerRadius = 32
+        self.layer.cornerRadius = 28
         let leftTextView = UILabel()
         leftTextView.text = "  ◦  "
         leftTextView.font = .Spoqa(size: 16, weight: .regular)

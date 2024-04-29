@@ -15,15 +15,21 @@ final class AddPostViewModel {
     
     struct Input {
         let coordinate: Observable<String>
+        let startPointText: Observable<String>
+        let destinationText: Observable<String>
     }
     
     struct Output {
         let startPoint: Driver<String>
+        let startPointList: Observable<Array<SearchedAddress>>
+        let destinationList: Observable<Array<SearchedAddress>>
     }
     
     func transform(input: Input) -> Output {
         
         let addressString = PublishRelay<String>()
+        let startPointList = PublishRelay<Array<SearchedAddress>>()
+        let destinationList = PublishRelay<Array<SearchedAddress>>()
         
         input.coordinate
             .skip(1)
@@ -54,9 +60,39 @@ final class AddPostViewModel {
                 }
             }
             .disposed(by: disposeBag)
-            
         
-        return Output(startPoint: addressString.asDriver(onErrorJustReturn: "error"))
+        Observable.merge(
+            input.startPointText.asObservable().map { (isStartPoint: true, text: $0) },
+            input.destinationText.asObservable().map { (isStartPoint: false, text: $0) }
+        )
+        .flatMap { value in
+            let text = value.text
+            let isStartPoint = value.isStartPoint
+            return NetworkManager.shared.callGeocodingRequest(type: KeywordSearchModel.self, router: APIRouter.geocodingRouter(.keywordSearch(query: text )).convertToURLRequest())
+                .map { (isStartPoint: isStartPoint, response: $0) }
+        }
+        .bind(with: self) { owner, value in
+            let isStartPointText = value.isStartPoint
+            let response = value.response
+            switch response {
+            case .success(let success):
+                if isStartPointText {
+                    startPointList.accept(success.documents)
+                } else {
+                    destinationList.accept(success.documents)
+                }
+                print(success)
+            case .failure(let error):
+                print(error)
+            }
+        }
+        .disposed(by: disposeBag)
+        
+        return Output(
+            startPoint: addressString.asDriver(onErrorJustReturn: "error"),
+            startPointList: startPointList.asObservable(),
+            destinationList: destinationList.asObservable()
+        )
     }
     
 }

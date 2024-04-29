@@ -52,13 +52,25 @@ final class AddPostViewController: BaseViewController {
         let currentPosition = "\(mainView.currentPosition.lng),\(mainView.currentPosition.lat)"
         coordinate.accept(currentPosition)
         
-        let input = AddPostViewModel.Input(coordinate: coordinate.asObservable())
+        let sheetView = bottomSheetView.bottomSheetView
+        let input = AddPostViewModel.Input(
+            coordinate: coordinate.asObservable(),
+            startPointText: sheetView.startPointTextField.rx.text.orEmpty.asObservable(),
+            destinationText: sheetView.destinationTextField.rx.text.orEmpty.asObservable()
+        )
         
         let output = viewModel.transform(input: input)
         
         output.startPoint
             .drive(bottomSheetView.bottomSheetView.startPointTextField.rx.text).disposed(by: disposeBag)
-
+        
+        Observable.merge(output.startPointList, output.destinationList)
+            .bind(to: sheetView.tableView.rx.items(cellIdentifier: SearchedAddressTableViewCell.identifier, cellType: SearchedAddressTableViewCell.self)) { index, element, cell in
+                cell.placeName.text = element.placeName
+                cell.address.text = element.address
+            }
+            .disposed(by: disposeBag)
+            
     }
     
     private func configureBottomSheet() {
