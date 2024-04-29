@@ -83,22 +83,24 @@ struct tabSwiftUIView: View {
     }
     
     func tabbars() -> some View {
-        ZStack(alignment: .bottom) {
-            TabViews.allCases[selectedIndex].asViewController
-            VStack() {
-                AnimatedTabBar(selectedIndex: $selectedIndex,
-                               views: TabViews.allCases.map { wiggleButtonAt($0.rawValue, name: $0.tabImage)})
-                .cornerRadius(24)
-                .selectedColor(.pointPurple)
-                .unselectedColor(.gray.opacity(0.3))
-                .ballColor(.pointPurple)
-                .verticalPadding(30)
-                .barColor(.tabbar)
+        NavigationStack {
+            ZStack(alignment: .bottom) {
+                TabViews.allCases[selectedIndex].asViewController
+                VStack() {
+                    AnimatedTabBar(selectedIndex: $selectedIndex,
+                                   views: TabViews.allCases.map { wiggleButtonAt($0.rawValue, name: $0.tabImage)})
+                    .cornerRadius(24)
+                    .selectedColor(.pointPurple)
+                    .unselectedColor(.gray.opacity(0.3))
+                    .ballColor(.pointPurple)
+                    .verticalPadding(30)
+                    .barColor(.tabbar)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.horizontal, 2)
             }
-            .frame(maxWidth: .infinity)
-            .padding(.horizontal, 2)
+            .ignoresSafeArea(.all)
         }
-        .ignoresSafeArea(.all)
     }
     
     func wiggleButtonAt(_ index: Int, name: String) -> some View {

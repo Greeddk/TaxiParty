@@ -11,10 +11,10 @@ import SnapKit
 
 final class SearchedAddressTableViewCell: BaseTableViewCell {
 
-    let placeName = UILabel().then {
+    private let placeName = UILabel().then {
         $0.font = .Spoqa(size: 14, weight: .regular)
     }
-    let address = UILabel().then {
+    private let address = UILabel().then {
         $0.font = .Spoqa(size: 13, weight: .regular)
         $0.textColor = .systemGray3
     }
@@ -56,5 +56,10 @@ final class SearchedAddressTableViewCell: BaseTableViewCell {
             make.width.equalTo(40)
             make.height.equalTo(25)
         }
+    }
+    
+    func configureCell(item: SearchedAddress) {
+        placeName.text = item.placeName
+        address.text = item.roadAddressName
     }
 }

@@ -56,7 +56,10 @@ final class AddPostViewController: BaseViewController {
         let input = AddPostViewModel.Input(
             coordinate: coordinate.asObservable(),
             startPointText: sheetView.startPointTextField.rx.text.orEmpty.asObservable(),
-            destinationText: sheetView.destinationTextField.rx.text.orEmpty.asObservable()
+            destinationText: sheetView.destinationTextField.rx.text.orEmpty.asObservable(),
+            startPointTextFieldSelected: sheetView.startPointTextField.rx.controlEvent(.editingDidBegin).asObservable(),
+            destinationTextFieldSelected: sheetView.destinationTextField.rx.controlEvent(.editingDidBegin)
+                .asObservable()
         )
         
         let output = viewModel.transform(input: input)
@@ -64,10 +67,29 @@ final class AddPostViewController: BaseViewController {
         output.startPoint
             .drive(bottomSheetView.bottomSheetView.startPointTextField.rx.text).disposed(by: disposeBag)
         
+        output.focusStartPoint
+            .drive(with: self) { owner, value in
+                owner.bottomSheetView.toggleTextFieldFocus(isStartPoint: value)
+            }
+            .disposed(by: disposeBag)
+        
         Observable.merge(output.startPointList, output.destinationList)
             .bind(to: sheetView.tableView.rx.items(cellIdentifier: SearchedAddressTableViewCell.identifier, cellType: SearchedAddressTableViewCell.self)) { index, element, cell in
-                cell.placeName.text = element.placeName
-                cell.address.text = element.address
+                cell.configureCell(item: element)
+            }
+            .disposed(by: disposeBag)
+        
+        bottomSheetView.bottomSheetView.tableView.rx
+            .modelSelected(SearchedAddress.self)
+            .withLatestFrom(output.focusStartPoint) { item, isStartPoint in
+                return (item: item, isStartPoint: isStartPoint)
+            }
+            .subscribe(with: self) { owner, value in
+                if value.isStartPoint {
+                    owner.bottomSheetView.bottomSheetView.startPointTextField.text = value.item.placeName
+                } else {
+                    owner.bottomSheetView.bottomSheetView.destinationTextField.text = value.item.placeName
+                }
             }
             .disposed(by: disposeBag)
             

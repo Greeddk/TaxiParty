@@ -9,7 +9,7 @@ import UIKit
 import SnapKit
 import Then
 
-final class ConfigurePostView: BaseView {
+final class SearchAddressView: BaseView {
 
     let backButton = UIButton().then {
         let imageConfig = UIImage.SymbolConfiguration(pointSize: 24, weight: .regular)

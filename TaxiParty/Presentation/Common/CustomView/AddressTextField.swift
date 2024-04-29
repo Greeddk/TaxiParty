@@ -27,20 +27,26 @@ class AddressTextField: UITextField {
         self.leftView = leftTextView
         self.leftViewMode = .always
     }
+    
+    func focusTextField(isFocus: Bool) {
+        if isFocus {
+            self.backgroundColor = .systemGray6
+        } else {
+            self.backgroundColor = .clear
+        }
+    }
 }
 
 extension AddressTextField: UITextFieldDelegate {
-    
-    func textFieldDidBeginEditing(_ textField: UITextField) {
-        self.backgroundColor = .systemGray6
-    }
-    
-    func textFieldDidEndEditing(_ textField: UITextField) {
-        self.backgroundColor = .clear
-    }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         endEditing(true)
         return true
     }
+    
+    func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
+        textField.text = ""
+        return true
+    }
+    
 }

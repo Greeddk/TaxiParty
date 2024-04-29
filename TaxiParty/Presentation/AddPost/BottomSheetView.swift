@@ -31,23 +31,15 @@ final class BottomSheetView: PassThroughView {
         }
     }
     
-    let bottomSheetView = ConfigurePostView()
+    let bottomSheetView = SearchAddressView()
     let addressLabel = UILabel()
     
     lazy var mode: Mode = .tip {
         didSet {
             switch self.mode {
             case .tip:
-                self.bottomSheetView.backButton.isHidden = true
-                self.bottomSheetView.dividerView.isHidden = true
-                self.bottomSheetView.headerLabel.isHidden = true
-                self.bottomSheetView.tableView.isHidden = true
                 break
             case .full:
-                self.bottomSheetView.backButton.isHidden = false
-                self.bottomSheetView.dividerView.isHidden = false
-                self.bottomSheetView.headerLabel.isHidden = false
-                self.bottomSheetView.tableView.isHidden = false
                 break
             }
             self.updateConstraint(offset: Const.bottomSheetYPosition(self.mode))
@@ -95,6 +87,11 @@ final class BottomSheetView: PassThroughView {
             options: .allowAnimatedContent,
             animations: {
                 self.mode = .tip
+                self.bottomSheetView.backButton.isHidden = true
+                self.bottomSheetView.dividerView.isHidden = true
+                self.bottomSheetView.headerLabel.isHidden = true
+                self.bottomSheetView.tableView.isHidden = true
+                self.defocusTextField()
             },
             completion: nil
         )
@@ -107,6 +104,10 @@ final class BottomSheetView: PassThroughView {
             options: .allowAnimatedContent,
             animations: {
                 self.mode = .full
+                self.bottomSheetView.backButton.isHidden = false
+                self.bottomSheetView.dividerView.isHidden = false
+                self.bottomSheetView.headerLabel.isHidden = false
+                self.bottomSheetView.tableView.isHidden = false
             },
             completion: nil
         )
@@ -119,4 +120,13 @@ final class BottomSheetView: PassThroughView {
         }
     }
     
+    func toggleTextFieldFocus(isStartPoint: Bool) {
+        bottomSheetView.startPointTextField.focusTextField(isFocus: isStartPoint)
+        bottomSheetView.destinationTextField.focusTextField(isFocus: !isStartPoint)
+    }
+    
+    func defocusTextField() {
+        bottomSheetView.startPointTextField.focusTextField(isFocus: false)
+        bottomSheetView.destinationTextField.focusTextField(isFocus: false)
+    }
 }

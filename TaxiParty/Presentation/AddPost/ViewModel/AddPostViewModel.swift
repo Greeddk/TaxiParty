@@ -17,17 +17,21 @@ final class AddPostViewModel {
         let coordinate: Observable<String>
         let startPointText: Observable<String>
         let destinationText: Observable<String>
+        let startPointTextFieldSelected: Observable<Void>
+        let destinationTextFieldSelected: Observable<Void>
     }
     
     struct Output {
         let startPoint: Driver<String>
         let startPointList: Observable<Array<SearchedAddress>>
         let destinationList: Observable<Array<SearchedAddress>>
+        let focusStartPoint: Driver<Bool>
     }
     
     func transform(input: Input) -> Output {
         
         let addressString = PublishRelay<String>()
+        let focusStartPoint = PublishRelay<Bool>()
         let startPointList = PublishRelay<Array<SearchedAddress>>()
         let destinationList = PublishRelay<Array<SearchedAddress>>()
         
@@ -61,10 +65,21 @@ final class AddPostViewModel {
             }
             .disposed(by: disposeBag)
         
+        Observable.merge(input.startPointTextFieldSelected.asObservable().map { true }, input.destinationTextFieldSelected.asObservable().map { false })
+            .bind(with: self) { owner, value in
+                if value {
+                    focusStartPoint.accept(true)
+                } else {
+                    focusStartPoint.accept(false)
+                }
+            }
+            .disposed(by: disposeBag)
+            
         Observable.merge(
             input.startPointText.asObservable().map { (isStartPoint: true, text: $0) },
             input.destinationText.asObservable().map { (isStartPoint: false, text: $0) }
         )
+        .filter { !$0.text.isEmpty }
         .flatMap { value in
             let text = value.text
             let isStartPoint = value.isStartPoint
@@ -91,7 +106,8 @@ final class AddPostViewModel {
         return Output(
             startPoint: addressString.asDriver(onErrorJustReturn: "error"),
             startPointList: startPointList.asObservable(),
-            destinationList: destinationList.asObservable()
+            destinationList: destinationList.asObservable(),
+            focusStartPoint: focusStartPoint.asDriver(onErrorJustReturn: false)
         )
     }
     
