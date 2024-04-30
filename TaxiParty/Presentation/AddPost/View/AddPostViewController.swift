@@ -89,6 +89,8 @@ final class AddPostViewController: BaseViewController {
                     owner.bottomSheetView.bottomSheetView.startPointTextField.text = value.item.placeName
                 } else {
                     owner.bottomSheetView.bottomSheetView.destinationTextField.text = value.item.placeName
+                    let fillPostVC = FillPostViewController()
+                    owner.navigationController?.pushViewController(fillPostVC, animated: true)
                 }
             }
             .disposed(by: disposeBag)

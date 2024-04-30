@@ -43,6 +43,7 @@ final class BottomSheetView: PassThroughView {
                 break
             }
             self.updateConstraint(offset: Const.bottomSheetYPosition(self.mode))
+            self.bottomSheetView.updateConstraints(isFullmode: self.mode == .full)
         }
     }
     var bottomSheetColor: UIColor? {
@@ -88,9 +89,6 @@ final class BottomSheetView: PassThroughView {
             animations: {
                 self.mode = .tip
                 self.bottomSheetView.backButton.isHidden = true
-                self.bottomSheetView.dividerView.isHidden = true
-                self.bottomSheetView.headerLabel.isHidden = true
-                self.bottomSheetView.tableView.isHidden = true
                 self.defocusTextField()
             },
             completion: nil
@@ -105,9 +103,6 @@ final class BottomSheetView: PassThroughView {
             animations: {
                 self.mode = .full
                 self.bottomSheetView.backButton.isHidden = false
-                self.bottomSheetView.dividerView.isHidden = false
-                self.bottomSheetView.headerLabel.isHidden = false
-                self.bottomSheetView.tableView.isHidden = false
             },
             completion: nil
         )

@@ -30,17 +30,13 @@ final class SearchAddressView: BaseView {
     }
     let dividerView = UIView().then {
         $0.backgroundColor = .systemGray6
-        $0.isHidden = true
     }
     let headerLabel = UILabel().then {
         $0.text = "장소결과"
         $0.font = .Spoqa(size: 14, weight: .regular)
         $0.textColor = .systemGray3
-        $0.isHidden = true
     }
-    let tableView = UITableView().then {
-        $0.isHidden = true
-    }
+    let tableView = UITableView()
 
     override func setHierarchy() {
         addSubViews(views: [backButton, startPointTextField, intervalLine, destinationTextField, dividerView, headerLabel, tableView])
@@ -72,21 +68,66 @@ final class SearchAddressView: BaseView {
         dividerView.snp.makeConstraints { make in
             make.top.equalTo(destinationTextField.snp.bottom).offset(30)
             make.width.equalTo(self)
-            make.height.equalTo(8)
+            make.height.equalTo(0)
         }
         headerLabel.snp.makeConstraints { make in
             make.top.equalTo(dividerView.snp.bottom).offset(20)
             make.leading.equalTo(15)
+            make.height.equalTo(0)
         }
         tableView.snp.makeConstraints { make in
             make.top.equalTo(headerLabel.snp.bottom).offset(10)
             make.horizontalEdges.equalTo(self)
-            make.bottom.equalTo(self).offset(-85)
+            make.height.equalTo(0)
+        }
+    }
+    
+    func updateConstraints(isFullmode: Bool) {
+        if isFullmode {
+            dividerView.snp.remakeConstraints { make in
+                make.top.equalTo(destinationTextField.snp.bottom).offset(30)
+                make.width.equalTo(self)
+                make.height.equalTo(8)
+            }
+            headerLabel.snp.remakeConstraints { make in
+                make.top.equalTo(dividerView.snp.bottom).offset(20)
+                make.leading.equalTo(15)
+            }
+            tableView.snp.remakeConstraints { make in
+                make.top.equalTo(headerLabel.snp.bottom).offset(10)
+                make.horizontalEdges.equalTo(self)
+                make.bottom.equalTo(self).offset(-85)
+            }
+        } else {
+            dividerView.snp.remakeConstraints { make in
+                make.top.equalTo(destinationTextField.snp.bottom).offset(30)
+                make.width.equalTo(self)
+                make.height.equalTo(0)
+            }
+            headerLabel.snp.remakeConstraints { make in
+                make.top.equalTo(dividerView.snp.bottom).offset(20)
+                make.leading.equalTo(15)
+                make.height.equalTo(0)
+            }
+            tableView.snp.remakeConstraints { make in
+                make.top.equalTo(headerLabel.snp.bottom).offset(10)
+                make.horizontalEdges.equalTo(self)
+                make.height.equalTo(0)
+            }
         }
     }
     
     override func setupAttributes() {
+        tableView.delegate = self
         tableView.showsVerticalScrollIndicator = false
         tableView.register(SearchedAddressTableViewCell.self, forCellReuseIdentifier: SearchedAddressTableViewCell.identifier)
     }
+}
+
+extension SearchAddressView: UITableViewDelegate {
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+    }
+
 }

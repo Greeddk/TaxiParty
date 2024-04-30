@@ -8,6 +8,12 @@
 import UIKit
 
 final class FillPostViewController: BaseViewController {
+    
+    let mainView = FillPostView()
+    
+    override func loadView() {
+        self.view = mainView
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
