@@ -8,7 +8,7 @@
 import Foundation
 import RxSwift
 import RxCocoa
-
+// TODO: 택시 가격과 경로?
 final class FillPostViewModel: ViewModelProtocol {
     
     var disposeBag = DisposeBag()

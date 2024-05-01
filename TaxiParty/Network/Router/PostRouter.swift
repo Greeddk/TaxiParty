@@ -9,7 +9,7 @@ import Foundation
 import Alamofire
 
 enum PostRouter {
-    case fetchPost(query: String)
+    case fetchPost
     case writePost(query: PostQuery)
 }
 
@@ -23,7 +23,7 @@ extension PostRouter: RouterType {
         switch self {
         case .fetchPost:
             return .get
-        case .writePost(query: let query):
+        case .writePost:
             return .post
         }
     }
@@ -54,17 +54,21 @@ extension PostRouter: RouterType {
     }
     
     var queryItem: [URLQueryItem]? {
-        return nil
+        switch self {
+        case .fetchPost:
+            let queryItem = [URLQueryItem(name: "product_id", value: ProductId.taxiParty.rawValue), URLQueryItem(name: "limit", value: "20")]
+            return queryItem
+        case .writePost:
+            return nil
+        }
     }
     
     var body: Data? {
         switch self {
-        case .fetchPost(let query):
-            let encoder = JSONEncoder()
-            return try? encoder.encode(query)
+        case .fetchPost:
+            return nil
         case .writePost(let query):
-            let encoder = JSONEncoder()
-            return try? encoder.encode(query)
+            return nil
         }
     }
 }
