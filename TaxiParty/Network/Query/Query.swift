@@ -20,6 +20,24 @@ struct JoinQuery: HTTPBodyProtocol {
     let phoneNum: String
 }
 
-struct validationEmail: HTTPBodyProtocol {
+struct ValidationEmail: HTTPBodyProtocol {
     let email: String
+}
+
+struct PostQuery: HTTPBodyProtocol {
+    let title: String
+    let startPlaceData: String
+    let destinationData: String
+    let numberOfPeople: String
+    let dueDate: String
+    let productId: String
+    
+    enum CodingKeys: String, CodingKey {
+        case title
+        case startPlaceData = "content"
+        case destinationData = "content1"
+        case numberOfPeople = "content2"
+        case dueDate = "content3"
+        case productId = "product_id"
+    }
 }

@@ -9,9 +9,9 @@ import Foundation
 import RxSwift
 import RxCocoa
 
-final class SettingViewModel {
+final class SettingViewModel: ViewModelProtocol {
     
-    let disposeBag = DisposeBag()
+    var disposeBag = DisposeBag()
     
     struct Input {
         let fetchProfile: Observable<Void>

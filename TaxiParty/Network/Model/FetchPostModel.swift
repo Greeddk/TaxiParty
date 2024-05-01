@@ -18,28 +18,34 @@ struct FetchPostModel: Decodable {
 }
 
 struct Post: Decodable {
+    let postId: String
     let title: String
+    let startPlaceData: String
+    let destinationData: String
+    let numberOfPeople: String
     let dueDate: String
-    let startPoint: String
-    let destination: String
-    let maximumNum: String
-    let joinPeople: [String]
+    let productId: String
+    let createdAt: String
     let creator: Creator
-
+    let together: [String]
+    
     enum CodingKeys: String, CodingKey {
+        case postId = "post_id"
         case title
-        case dueDate = "content"
-        case startPoint = "content1"
-        case destination = "content2"
-        case maximumNum = "content3"
-        case joinPeople = "likes"
+        case startPlaceData = "content"
+        case destinationData = "content1"
+        case numberOfPeople = "content2"
+        case dueDate = "content3"
+        case productId = "product_id"
+        case createdAt
         case creator
+        case together = "likes"
     }
-
 }
 
 struct Creator: Decodable {
+    let user_id: String
     let nick: String
-    let profileImage: String
+    let profileImage: String?
 }
 

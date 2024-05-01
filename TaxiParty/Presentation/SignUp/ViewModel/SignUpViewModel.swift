@@ -9,9 +9,9 @@ import Foundation
 import RxSwift
 import RxCocoa
 
-final class SignUpViewModel {
+final class SignUpViewModel: ViewModelProtocol {
     
-    let disposeBag = DisposeBag()
+    var disposeBag = DisposeBag()
     
     let networkManager = NetworkManager.shared
     
@@ -83,7 +83,7 @@ final class SignUpViewModel {
                 descriptionText.accept("이메일 중복 체크 중이에요")
                 return self.networkManager.callRequest(
                     type: ValidationEmailModel.self,
-                    router: APIRouter.authenticationRouter(.validationEmail(query: validationEmail(email: email)))
+                    router: APIRouter.authenticationRouter(.validationEmail(query: ValidationEmail(email: email)))
                         .convertToURLRequest()
                 )
             }

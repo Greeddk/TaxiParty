@@ -21,7 +21,10 @@ extension UIViewController {
     
     func setNavigationBackButton() {
         hideBackButton()
-        let backButton = UIBarButtonItem(image: UIImage(systemName: "chevron.left"), style: .plain, target: self, action: #selector(backButtonClicked))
+        let imageConfig = UIImage.SymbolConfiguration(pointSize: 19, weight: .regular)
+        let image = UIImage(systemName: "arrow.backward", withConfiguration: imageConfig)
+        let backButton = UIBarButtonItem(image: image, style: .plain, target: self, action: #selector(backButtonClicked))
+        backButton.tintColor = .pointPurple
         navigationItem.leftBarButtonItem = backButton
     }
     

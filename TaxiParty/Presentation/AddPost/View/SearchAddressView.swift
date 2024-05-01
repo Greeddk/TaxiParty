@@ -15,7 +15,7 @@ final class SearchAddressView: BaseView {
         let imageConfig = UIImage.SymbolConfiguration(pointSize: 24, weight: .regular)
         let image = UIImage(systemName: "arrow.backward", withConfiguration: imageConfig)
         $0.setImage(image, for: .normal)
-        $0.tintColor = .black
+        $0.tintColor = .pointPurple
         $0.isHidden = true
     }
     let startPointTextField = AddressTextField().then {
@@ -50,7 +50,6 @@ final class SearchAddressView: BaseView {
         }
         startPointTextField.snp.makeConstraints { make in
             make.top.equalTo(self.safeAreaLayoutGuide).offset(30)
-            make.left.equalTo(self).offset(30)
             make.horizontalEdges.equalTo(self).inset(20)
             make.height.equalTo(50)
         }
@@ -61,7 +60,7 @@ final class SearchAddressView: BaseView {
         }
         destinationTextField.snp.makeConstraints { make in
             make.top.equalTo(startPointTextField.snp.bottom)
-            make.left.equalTo(startPointTextField)
+            make.leading.equalTo(startPointTextField)
             make.horizontalEdges.equalTo(startPointTextField)
             make.height.equalTo(50)
         }

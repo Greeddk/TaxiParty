@@ -16,7 +16,7 @@ enum Token: String {
 enum AuthenticationRouter {
     case login(query: LoginQuery)
     case join(query: JoinQuery)
-    case validationEmail(query: validationEmail)
+    case validationEmail(query: ValidationEmail)
     case withdraw
 }
 

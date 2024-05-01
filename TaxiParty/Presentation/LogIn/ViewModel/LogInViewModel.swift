@@ -9,9 +9,9 @@ import Foundation
 import RxSwift
 import RxCocoa
 
-final class LogInViewModel {
+final class LogInViewModel: ViewModelProtocol {
     
-    let disposeBag = DisposeBag()
+    var disposeBag = DisposeBag()
     
     struct Input {
         let emailText: Observable<String>
@@ -55,6 +55,7 @@ final class LogInViewModel {
                     loginSuccessTrigger.accept(true)
                 case .failure(let error):
                     // TODO: 로그인 실패 라벨로 보내기
+                    print(error)
                     indicatorTrigger.accept(false)
                     loginSuccessTrigger.accept(false)
                 }

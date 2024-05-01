@@ -60,6 +60,6 @@ final class SearchedAddressTableViewCell: BaseTableViewCell {
     
     func configureCell(item: SearchedAddress) {
         placeName.text = item.placeName
-        address.text = item.roadAddressName
+        address.text = item.address
     }
 }

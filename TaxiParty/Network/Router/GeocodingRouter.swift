@@ -10,6 +10,7 @@ import Alamofire
 
 enum GeocodingRouter {
     case getAddress(coords: String)
+    case getCoord(address: String)
     case keywordSearch(query: String)
 }
 
@@ -17,10 +18,12 @@ extension GeocodingRouter: RouterType {
 
     var baseURL: String {
         switch self {
-        case .getAddress(let coords):
+        case .getAddress:
             return APIKey.naverBaseURL.rawValue
-        case .keywordSearch(let query):
+        case .keywordSearch:
             return APIKey.kakaoBaseURL.rawValue
+        case .getCoord:
+            return APIKey.naverBaseURL.rawValue
         }
     }
     
@@ -29,6 +32,8 @@ extension GeocodingRouter: RouterType {
         case .getAddress:
             return .get
         case .keywordSearch:
+            return .get
+        case .getCoord(address: let address):
             return .get
         }
     }
@@ -39,6 +44,8 @@ extension GeocodingRouter: RouterType {
             return "/map-reversegeocode/v2/gc"
         case .keywordSearch:
             return "/v2/local/search/keyword"
+        case .getCoord:
+            return "/map-geocode/v2/geocode"
         }
     }
     
@@ -48,6 +55,8 @@ extension GeocodingRouter: RouterType {
             return [HTTPHeader.naverClientId.rawValue: APIKey.naverClientId.rawValue, HTTPHeader.naverClinetSecret.rawValue: APIKey.naverClientSecret.rawValue]
         case .keywordSearch:
             return [HTTPHeader.authorization.rawValue: APIKey.kakaoRestAPI.rawValue]
+        case .getCoord:
+            return [HTTPHeader.naverClientId.rawValue: APIKey.naverClientId.rawValue, HTTPHeader.naverClinetSecret.rawValue: APIKey.naverClientSecret.rawValue]
         }
     }
     
@@ -62,6 +71,9 @@ extension GeocodingRouter: RouterType {
             return queryItem
         case .keywordSearch(let query):
             let queryItem = [URLQueryItem(name: "query", value: query)]
+            return queryItem
+        case .getCoord(let address):
+            let queryItem = [URLQueryItem(name: "query", value: address)]
             return queryItem
         }
     }

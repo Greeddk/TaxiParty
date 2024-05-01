@@ -129,8 +129,8 @@ final class PartyPostCollectionViewCell: BaseCollectionViewCell {
         title.text = post.title
         creatorImage.image = UIImage(systemName: "person")
         creatorNick.text = post.creator.nick
-        startPointLabel.text = post.startPoint
-        destinationLabel.text = post.destination
-        leftNum.text = "\((Int(post.maximumNum) ?? 4) - 1 - post.joinPeople.count)명 남음"
+        startPointLabel.text = post.startPlaceData
+        destinationLabel.text = post.destinationData
+        leftNum.text = "\((Int(post.numberOfPeople) ?? 4) - 1 - post.together.count)명 남음"
     }
 }

@@ -9,9 +9,9 @@ import Foundation
 import RxSwift
 import RxCocoa
 
-final class AddPostViewModel {
+final class AddPostViewModel: ViewModelProtocol {
     
-    let disposeBag = DisposeBag()
+    var disposeBag = DisposeBag()
     
     struct Input {
         let coordinate: Observable<String>

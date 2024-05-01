@@ -90,6 +90,7 @@ final class AddPostViewController: BaseViewController {
                 } else {
                     owner.bottomSheetView.bottomSheetView.destinationTextField.text = value.item.placeName
                     let fillPostVC = FillPostViewController()
+                    fillPostVC.viewModel.route = (startPlaceName: owner.bottomSheetView.bottomSheetView.startPointTextField.text ?? "출발지 설정 필요", startPlaceCoord: currentPosition, destinationName: value.item.placeName, destinationAddress: value.item.address)
                     owner.navigationController?.pushViewController(fillPostVC, animated: true)
                 }
             }
