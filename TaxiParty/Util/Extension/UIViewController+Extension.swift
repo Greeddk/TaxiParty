@@ -37,4 +37,33 @@ extension UIViewController {
         navigationController?.popViewController(animated: true)
     }
     
+    func showAlertOnlyOK(title: String, message: String, action: @escaping (() -> Void?) ) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        let ok = UIAlertAction(title: "확인", style: .default) { _ in
+            action()
+        }
+        
+        alert.addAction(ok)
+        
+        present(alert, animated: true)
+    }
+
+    
+    func showAlert(title: String, message: String, action: @escaping (() -> Void?) ) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        let ok = UIAlertAction(title: "확인", style: .default) { _ in
+            action()
+        }
+        let cancel = UIAlertAction(title: "취소", style: .cancel)
+        
+        alert.addAction(ok)
+        alert.addAction(cancel)
+        
+        present(alert, animated: true)
+    }
+    
+    func changeFloatFormat(number : Double) -> String {
+        return String(format: "%.6f", number)
+    }
+    
 }

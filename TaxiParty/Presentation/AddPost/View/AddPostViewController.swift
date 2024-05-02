@@ -27,6 +27,7 @@ final class AddPostViewController: BaseViewController {
     
     let mainView = AddPostView()
     let viewModel = AddPostViewModel()
+    var startCoords = ""
     
     private let bottomSheetView: BottomSheetView = {
         let view = BottomSheetView()
@@ -48,9 +49,6 @@ final class AddPostViewController: BaseViewController {
     }
     
     override func bind() {
-        
-        let currentPosition = "\(mainView.currentPosition.lng),\(mainView.currentPosition.lat)"
-        coordinate.accept(currentPosition)
         
         let sheetView = bottomSheetView.bottomSheetView
         let input = AddPostViewModel.Input(
@@ -90,7 +88,7 @@ final class AddPostViewController: BaseViewController {
                 } else {
                     owner.bottomSheetView.bottomSheetView.destinationTextField.text = value.item.placeName
                     let fillPostVC = FillPostViewController()
-                    fillPostVC.viewModel.route = (startPlaceName: owner.bottomSheetView.bottomSheetView.startPointTextField.text ?? "출발지 설정 필요", startPlaceCoord: currentPosition, destinationName: value.item.placeName, destinationAddress: value.item.address)
+                    fillPostVC.viewModel.route = (startPlaceName: owner.bottomSheetView.bottomSheetView.startPointTextField.text ?? "출발지 설정 필요", startPlaceCoord: owner.startCoords, destinationName: value.item.placeName, destinationAddress: value.item.address)
                     owner.navigationController?.pushViewController(fillPostVC, animated: true)
                 }
             }
@@ -125,6 +123,7 @@ extension AddPostViewController: NMFMapViewCameraDelegate {
     
     func mapViewCameraIdle(_ mapView: NMFMapView) {
         let camposition = "\(mapView.cameraPosition.target.lng),\(mapView.cameraPosition.target.lat)"
+        startCoords = camposition
         coordinate.accept(camposition)
     }
     

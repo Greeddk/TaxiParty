@@ -24,11 +24,11 @@ final class FillPostViewController: BaseViewController {
         navigationController?.isNavigationBarHidden = false
         setNavigationBackButton()
         navigationItem.title = "파티 만들기"
+        fetchDataTrigger.accept(())
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        fetchDataTrigger.accept(())
     }
     
     override func bind() {
@@ -64,6 +64,28 @@ final class FillPostViewController: BaseViewController {
         
         output.enableMinusButton
             .drive(mainView.countMinusButton.rx.isEnabled)
+            .disposed(by: disposeBag)
+        
+        output.postComplete
+            .drive(with: self) { owner, value in
+                if value {
+                    owner.navigationController?.popToRootViewController(animated: true)
+                }
+            }
+            .disposed(by: disposeBag)
+        
+        output.errorAlertTrigger
+            .drive(with: self) { owner, value in
+                if value {
+                    owner.showAlertOnlyOK(title: "포스트 에러", message: "택시팟 모집글을 다시 작성해주세요", action: { })
+                }
+            }
+            .disposed(by: disposeBag)
+        
+        Observable.combineLatest(output.directionInfo.asObservable(), output.currentPeopleNum.asObservable())
+            .bind(with: self) { owner, value in
+                owner.mainView.updateMapRoute(item: value.0, currentNum: value.1)
+            }
             .disposed(by: disposeBag)
     }
 

@@ -27,6 +27,7 @@ final class AddPostView: BaseMapView {
     
     override func setupAttributes() {
         naverMapView.mapView.zoomLevel = 17
+        naverMapView.showZoomControls = false
     }
 
 }

@@ -8,7 +8,7 @@
 import Foundation
 import RxSwift
 import RxCocoa
-// TODO: 택시 가격과 경로?
+
 final class FillPostViewModel: ViewModelProtocol {
     
     var disposeBag = DisposeBag()
@@ -30,6 +30,9 @@ final class FillPostViewModel: ViewModelProtocol {
         let currentPeopleNum: Driver<String>
         let enablePlusButton: Driver<Bool>
         let enableMinusButton: Driver<Bool>
+        let postComplete: Driver<Bool>
+        let errorAlertTrigger: Driver<Bool>
+        let directionInfo: Driver<DirectionModel>
     }
     
     func transform(input: Input) -> Output {
@@ -42,7 +45,14 @@ final class FillPostViewModel: ViewModelProtocol {
         let dueDate = PublishRelay<String>()
         let enablePlusButton = BehaviorSubject(value: true)
         let enableMinusButton = BehaviorSubject(value: false)
+        let directionInfo = PublishRelay<DirectionModel>()
         
+        let postComplete = PublishRelay<Bool>()
+        let errorAlertTrigger = PublishRelay<Bool>()
+        
+        let startLngLat = PublishRelay<String>()
+        let destinationLngLat = PublishRelay<String>()
+        let directionObservable = Observable.combineLatest(startLngLat, destinationLngLat)
         let postObservable = Observable.combineLatest(input.inputTitleText, startPlaceData, destinationData, currentPeopleNum, dueDate)
         
         input.fetchDataTrigger
@@ -59,10 +69,27 @@ final class FillPostViewModel: ViewModelProtocol {
                 startPlaceName.accept(value.startPlaceName)
                 destinationName.accept(value.destinationName)
                 startPlaceData.accept("\(value.startPlaceName),\(value.startPlaceCoord)")
+                startLngLat.accept(value.startPlaceCoord)
                 switch value.response {
                 case .success(let success):
                     let coords = "\(success.addresses.first?.x ?? "0"),\(success.addresses.first?.y ?? "0")"
                     destinationData.accept("\(value.destinationName),\(coords)")
+                    destinationLngLat.accept(coords)
+                case .failure(let error):
+                    print(error)
+                }
+            }
+            .disposed(by: disposeBag)
+        
+        directionObservable
+            .flatMap { coords in
+                return NetworkManager.shared.callGeocodingRequest(type: DirectionModel.self, router: APIRouter.geocodingRouter(.fetchDirection(start: coords.0, goal: coords.1)).convertToURLRequest())
+            }
+            .bind(with: self) { owner, response in
+                switch response {
+                case .success(let success):
+                    print(success.route.traoptimal.first?.summary)
+                    directionInfo.accept(success)
                 case .failure(let error):
                     print(error)
                 }
@@ -108,13 +135,17 @@ final class FillPostViewModel: ViewModelProtocol {
             .withLatestFrom(postObservable)
             .flatMap { postQuery in
                 let query = PostQuery(title: postQuery.0, startPlaceData: postQuery.1, destinationData: postQuery.2, numberOfPeople: postQuery.3, dueDate: postQuery.4, productId: ProductId.taxiParty.rawValue)
+                print("---------------------------------")
+                print(query)
                 return NetworkManager.shared.callRequest(type: Post.self, router: APIRouter.postRouter(.writePost(query: query)).convertToURLRequest())
             }
             .bind(with: self) { owner, response in
                 switch response {
                 case .success(let success):
+                    postComplete.accept(true)
                     print(success)
                 case .failure(let error):
+                    errorAlertTrigger.accept(true)
                     print(error)
                 }
             }
@@ -125,7 +156,10 @@ final class FillPostViewModel: ViewModelProtocol {
             destinationName: destinationName.asDriver(onErrorJustReturn: "오류") ,
             currentPeopleNum: currentPeopleNum.asDriver(onErrorJustReturn: "2"),
             enablePlusButton: enablePlusButton.asDriver(onErrorJustReturn: false),
-            enableMinusButton: enableMinusButton.asDriver(onErrorJustReturn: false)
+            enableMinusButton: enableMinusButton.asDriver(onErrorJustReturn: false),
+            postComplete: postComplete.asDriver(onErrorJustReturn: false),
+            errorAlertTrigger: errorAlertTrigger.asDriver(onErrorJustReturn: false),
+            directionInfo: directionInfo.asDriver(onErrorJustReturn: DirectionModel(message: "", route: Route(traoptimal: [])))
         )
     }
 

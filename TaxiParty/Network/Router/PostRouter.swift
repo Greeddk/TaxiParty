@@ -68,7 +68,8 @@ extension PostRouter: RouterType {
         case .fetchPost:
             return nil
         case .writePost(let query):
-            return nil
+            let encoder = JSONEncoder()
+            return try? encoder.encode(query)
         }
     }
 }
