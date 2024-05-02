@@ -11,16 +11,24 @@ import AnimatedTabBar
 
 final class MainPagerViewController: BaseViewController {
     
+    private var tabView: tabSwiftUIView!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         openAnimatedTabView()
     }
     
     private func openAnimatedTabView() {
-        let hostingController = UIHostingController(rootView: tabSwiftUIView())
+        tabView = tabSwiftUIView()
+        let hostingController = UIHostingController(rootView: tabView)
         hostingController.sizingOptions = .preferredContentSize
         hostingController.modalPresentationStyle = .fullScreen
         self.present(hostingController, animated: false)
+    }
+    
+    func didCompletePost() {
+        tabView.updateIndex(index: 0)
+        print("실행됨2222")
     }
     
 }
@@ -28,7 +36,6 @@ final class MainPagerViewController: BaseViewController {
 struct tabSwiftUIView: View {
     
     @State private var selectedIndex = 0
-    @State private var prevSelectedIndex = 0
     
     enum TabViews: Int, CaseIterable {
         case searchPostView
@@ -106,5 +113,10 @@ struct tabSwiftUIView: View {
     func wiggleButtonAt(_ index: Int, name: String) -> some View {
         WiggleButton(image: Image(systemName: name), maskImage: Image(systemName: "\(name).fill"), isSelected: index == selectedIndex)
             .scaleEffect(1.3)
+    }
+    
+    func updateIndex(index: Int) {
+        self.selectedIndex = index
+        print(selectedIndex)
     }
 }

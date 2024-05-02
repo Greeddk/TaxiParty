@@ -88,7 +88,6 @@ final class FillPostViewModel: ViewModelProtocol {
             .bind(with: self) { owner, response in
                 switch response {
                 case .success(let success):
-                    print(success.route.traoptimal.first?.summary)
                     directionInfo.accept(success)
                 case .failure(let error):
                     print(error)

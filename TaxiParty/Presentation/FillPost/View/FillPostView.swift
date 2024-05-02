@@ -31,9 +31,11 @@ final class FillPostView: BaseView {
     }
     let startPointLabel = UILabel().then {
         $0.font = .Spoqa(size: 14, weight: .bold)
+        $0.numberOfLines = 0
     }
     let destinationLabel = UILabel().then {
         $0.font = .Spoqa(size: 14, weight: .bold)
+        $0.numberOfLines = 0
     }
     private let startInfoLabel = UILabel().then {
         $0.font = .Spoqa(size: 12, weight: .medium)
@@ -130,6 +132,7 @@ final class FillPostView: BaseView {
         }
         startPointLabel.snp.makeConstraints { make in
             make.leading.equalTo(startPointIcon.snp.trailing).offset(12)
+            make.trailing.lessThanOrEqualTo(taxiFareInfoLabel.snp.leading)
             make.centerY.equalTo(startPointIcon)
         }
         startInfoLabel.snp.makeConstraints { make in
@@ -144,6 +147,7 @@ final class FillPostView: BaseView {
         }
         destinationLabel.snp.makeConstraints { make in
             make.leading.equalTo(startPointLabel)
+            make.trailing.lessThanOrEqualTo(taxiFarePerOneInfoLabel.snp.leading)
             make.centerY.equalTo(destinationIcon)
         }
         destinationInfoLabel.snp.makeConstraints { make in
@@ -158,7 +162,7 @@ final class FillPostView: BaseView {
         }
         taxiFareInfoLabel.snp.makeConstraints { make in
             make.top.equalTo(startPointLabel)
-            make.trailing.equalTo(self).offset(-100)
+            make.trailing.equalTo(self).offset(-60)
         }
         taxiFareLabel.snp.makeConstraints { make in
             make.top.equalTo(taxiFareInfoLabel.snp.bottom)
@@ -173,24 +177,24 @@ final class FillPostView: BaseView {
             make.leading.equalTo(taxiFarePerOneInfoLabel)
         }
         countLabel.snp.makeConstraints { make in
-            make.top.equalTo(destinationInfoLabel.snp.bottom).offset(30)
+            make.top.equalTo(destinationInfoLabel.snp.bottom).offset(20)
             make.leading.equalTo(self).offset(20)
         }
         countStackView.snp.makeConstraints { make in
-            make.top.equalTo(countLabel.snp.bottom).offset(10)
+            make.top.equalTo(countLabel.snp.bottom).offset(4)
             make.horizontalEdges.equalTo(self).inset(120)
             make.height.equalTo(50)
         }
         dueDateLabel.snp.makeConstraints { make in
-            make.top.equalTo(countStackView.snp.bottom).offset(20)
+            make.top.equalTo(countStackView.snp.bottom).offset(10)
             make.leading.equalTo(self).offset(20)
         }
         dueDate.snp.makeConstraints { make in
-            make.top.equalTo(dueDateLabel.snp.bottom).offset(20)
+            make.top.equalTo(dueDateLabel.snp.bottom).offset(10)
             make.centerX.equalTo(self)
         }
         mapView.snp.makeConstraints { make in
-            make.top.equalTo(dueDate.snp.bottom).offset(10)
+            make.top.equalTo(dueDate.snp.bottom).offset(20)
             make.horizontalEdges.equalTo(self).inset(20)
             make.bottom.equalTo(postButton.snp.top).offset(-10)
         }

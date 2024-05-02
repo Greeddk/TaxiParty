@@ -69,7 +69,8 @@ final class FillPostViewController: BaseViewController {
         output.postComplete
             .drive(with: self) { owner, value in
                 if value {
-                    owner.navigationController?.popToRootViewController(animated: true)
+                    //TODO: 탭바 첫 페이지로 이동...
+                    owner.navigationController?.popViewController(animated: true)
                 }
             }
             .disposed(by: disposeBag)
