@@ -1,18 +1,17 @@
 //
-//  FillPostView.swift
+//  PostDetailView.swift
 //  TaxiParty
 //
-//  Created by Greed on 4/30/24.
+//  Created by Greed on 5/3/24.
 //
 
 import UIKit
 import SnapKit
 import Then
 
-final class FillPostView: BaseView {
+final class PostDetailView: BaseView {
     
-    let title = PointBorderTextField().then {
-        $0.placeholder = "택시팟 모집 문구를 작성해주세요"
+    private let title = UILabel().then {
         $0.font = .Spoqa(size: 16, weight: .medium)
     }
     private let routeLabel = UILabel().then {
@@ -28,11 +27,11 @@ final class FillPostView: BaseView {
     private let interLineImage = UIImageView().then {
         $0.image = UIImage(named: "dotLine")
     }
-    let startPointLabel = UILabel().then {
+    private let startPointLabel = UILabel().then {
         $0.font = .Spoqa(size: 14, weight: .bold)
         $0.numberOfLines = 0
     }
-    let destinationLabel = UILabel().then {
+    private let destinationLabel = UILabel().then {
         $0.font = .Spoqa(size: 14, weight: .bold)
         $0.numberOfLines = 0
     }
@@ -64,67 +63,43 @@ final class FillPostView: BaseView {
         $0.font = .Spoqa(size: 14, weight: .bold)
         $0.textColor = .pointPurple
     }
-    private let countStackView = UIStackView().then {
-        $0.axis = .horizontal
-        $0.alignment = .center
-        $0.distribution = .equalCentering
-    }
-    private let countLabel = UILabel().then {
-        $0.text = "몇 분과 파티 하실래요? (본인포함)"
+    private let numberOfPeople = UILabel().then {
         $0.font = .Spoqa(size: 12, weight: .regular)
-    }
-    private let countContentView = UIView()
-    let countMinusButton = UIButton().then {
-        let imageConfig = UIImage.SymbolConfiguration(pointSize: 24, weight: .regular)
-        let image = UIImage(systemName: "minus.circle", withConfiguration: imageConfig)
-        $0.setImage(image, for: .normal)
-        $0.tintColor = .pointPurple
-    }
-    let countPlusButton = UIButton().then {
-        let imageConfig = UIImage.SymbolConfiguration(pointSize: 24, weight: .regular)
-        let image = UIImage(systemName: "plus.circle", withConfiguration: imageConfig)
-        $0.setImage(image, for: .normal)
-        $0.tintColor = .pointPurple
-    }
-    let peopleCount = UILabel().then {
-        $0.text = "2"
-        $0.textAlignment = .center
     }
     private let dueDateLabel = UILabel().then {
-        $0.text = "언제 출발하세요?"
+        $0.text = "출발 일정"
         $0.font = .Spoqa(size: 12, weight: .regular)
     }
-    let dueDate = UIDatePicker().then {
-        $0.preferredDatePickerStyle = .compact
-        $0.datePickerMode = .dateAndTime
-        $0.locale = Locale(identifier: "ko_KR")
-        $0.tintColor = .pointPurple
+    private let dueDate = UILabel().then {
+        $0.font = .Spoqa(size: 14, weight: .medium)
+    }
+    private let joinNumInfoLabel = UILabel().then {
+        $0.font = .Spoqa(size: 12, weight: .regular)
+        $0.text = "같이 타는 인원"
+    }
+    private let joinNumLabel = UILabel().then {
+        $0.font = .Spoqa(size: 14, weight: .medium)
     }
     private let mapView = BaseMapView().then {
         $0.clipsToBounds = true
-        $0.naverMapView.showLocationButton = false
-        $0.naverMapView.mapView.locationOverlay.hidden = true
         $0.layer.cornerRadius = 20
     }
-    let postButton = PointColorButton().then {
-        $0.setTitle("파티 구하기", for: .normal)
+    let joinButton = PointColorButton().then {
+        $0.setTitle("택시 같이타기", for: .normal)
     }
     
     override func setHierarchy() {
-        addSubViews(views: [title, routeLabel, startPointIcon, destinationIcon, interLineImage, startPointLabel, destinationLabel, startInfoLabel, destinationInfoLabel, taxiFareLabel, taxiFareInfoLabel, taxiFarePerOneInfoLabel, taxiFarePerOneLabel, countLabel, countStackView, dueDateLabel, dueDate, mapView, postButton])
-        countStackView.addArrangedSubview(countMinusButton)
-        countStackView.addArrangedSubview(peopleCount)
-        countStackView.addArrangedSubview(countPlusButton)
+        addSubViews(views: [title, routeLabel, startPointIcon, startPointLabel, startInfoLabel, destinationIcon, destinationLabel, destinationInfoLabel, interLineImage, taxiFareInfoLabel, taxiFareLabel, taxiFarePerOneInfoLabel, taxiFarePerOneLabel, numberOfPeople, dueDate, dueDateLabel, joinNumInfoLabel, joinNumLabel, mapView, joinButton])
     }
     
     override func setupLayout() {
         title.snp.makeConstraints { make in
-            make.top.equalTo(self.safeAreaLayoutGuide).offset(30)
-            make.horizontalEdges.equalTo(self).inset(30)
+            make.top.equalTo(self.safeAreaLayoutGuide)
+            make.horizontalEdges.equalTo(self).inset(20)
             make.height.equalTo(50)
         }
         routeLabel.snp.makeConstraints { make in
-            make.top.equalTo(title.snp.bottom).offset(20)
+            make.top.equalTo(title.snp.bottom).offset(5)
             make.leading.equalTo(self).offset(20)
         }
         startPointIcon.snp.makeConstraints { make in
@@ -178,33 +153,41 @@ final class FillPostView: BaseView {
             make.top.equalTo(taxiFarePerOneInfoLabel.snp.bottom)
             make.leading.equalTo(taxiFarePerOneInfoLabel)
         }
-        countLabel.snp.makeConstraints { make in
-            make.top.equalTo(destinationInfoLabel.snp.bottom).offset(20)
-            make.leading.equalTo(self).offset(20)
-        }
-        countStackView.snp.makeConstraints { make in
-            make.top.equalTo(countLabel.snp.bottom).offset(4)
-            make.horizontalEdges.equalTo(self).inset(120)
-            make.height.equalTo(50)
-        }
         dueDateLabel.snp.makeConstraints { make in
-            make.top.equalTo(countStackView.snp.bottom).offset(10)
+            make.top.equalTo(destinationInfoLabel.snp.bottom).offset(10)
             make.leading.equalTo(self).offset(20)
         }
         dueDate.snp.makeConstraints { make in
             make.top.equalTo(dueDateLabel.snp.bottom).offset(10)
             make.centerX.equalTo(self)
         }
-        mapView.snp.makeConstraints { make in
-            make.top.equalTo(dueDate.snp.bottom).offset(20)
-            make.horizontalEdges.equalTo(self).inset(20)
-            make.bottom.equalTo(postButton.snp.top).offset(-10)
+        joinNumInfoLabel.snp.makeConstraints { make in
+            make.top.equalTo(dueDate.snp.bottom).offset(10)
+            make.leading.equalTo(self).offset(20)
         }
-        postButton.snp.makeConstraints { make in
+        joinNumLabel.snp.makeConstraints { make in
+            make.top.equalTo(joinNumInfoLabel.snp.bottom).offset(10)
+            make.centerX.equalTo(self)
+        }
+        mapView.snp.makeConstraints { make in
+            make.top.equalTo(joinNumLabel.snp.bottom).offset(10)
+            make.horizontalEdges.equalTo(self).inset(20)
+            make.bottom.equalTo(joinButton.snp.top).offset(-10)
+        }
+        joinButton.snp.makeConstraints { make in
             make.bottom.equalTo(self.snp.bottom).offset(-40)
             make.horizontalEdges.equalTo(self).inset(20)
             make.height.equalTo(60)
         }
+    }
+    
+    func configureCell(item: Post, startPlace: String, destination: String) {
+        title.text = item.title
+        startPointLabel.text = startPlace
+        destinationLabel.text = destination
+        dueDate.text = item.dueDate
+        var leftJoinNum = (Int(item.numberOfPeople) ?? 4) - 1 - item.together.count
+        joinNumLabel.text = "\(item.numberOfPeople) 자리 중 \(leftJoinNum) 자리 남음"
     }
     
     func updateMapView(item: DirectionModel, currentNum: String) {

@@ -85,7 +85,7 @@ final class FillPostViewController: BaseViewController {
         
         Observable.combineLatest(output.directionInfo.asObservable(), output.currentPeopleNum.asObservable())
             .bind(with: self) { owner, value in
-                owner.mainView.updateMapRoute(item: value.0, currentNum: value.1)
+                owner.mainView.updateMapView(item: value.0, currentNum: value.1)
             }
             .disposed(by: disposeBag)
     }

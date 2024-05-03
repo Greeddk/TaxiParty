@@ -134,8 +134,6 @@ final class FillPostViewModel: ViewModelProtocol {
             .withLatestFrom(postObservable)
             .flatMap { postQuery in
                 let query = PostQuery(title: postQuery.0, startPlaceData: postQuery.1, destinationData: postQuery.2, numberOfPeople: postQuery.3, dueDate: postQuery.4, productId: ProductId.taxiParty.rawValue)
-                print("---------------------------------")
-                print(query)
                 return NetworkManager.shared.callRequest(type: Post.self, router: APIRouter.postRouter(.writePost(query: query)).convertToURLRequest())
             }
             .bind(with: self) { owner, response in

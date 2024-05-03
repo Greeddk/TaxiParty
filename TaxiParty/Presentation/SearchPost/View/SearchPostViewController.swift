@@ -52,6 +52,15 @@ final class SearchPostViewController: BaseViewController {
             }
             .disposed(by: disposeBag)
         
+        mainView.collectionView.rx
+            .modelSelected(Post.self)
+            .bind(with: self) { owner, item in
+                let viewModel = PostDetailViewModel(postItem: item)
+                let postDetailViewController = PostDetailViewController(viewModel: viewModel)
+                owner.navigationController?.pushViewController(postDetailViewController, animated: true)
+            }
+            .disposed(by: disposeBag)
+        
     }
     
     private func collectionViewContentOffsetChanged() -> Observable<Void> {
