@@ -40,7 +40,9 @@ final class SearchPostViewController: BaseViewController {
     override func bind() {
         
         let input = SearchPostViewModel.Input(
-            fetchDataTrigger: fetchDataTrigger.asObservable())
+            fetchDataTrigger: fetchDataTrigger.asObservable(),
+            paginationTrigger: collectionViewContentOffsetChanged()
+        )
         
         let output = viewModel.transform(input: input)
         
@@ -49,6 +51,20 @@ final class SearchPostViewController: BaseViewController {
                 cell.configureCell(post: element)
             }
             .disposed(by: disposeBag)
+        
+    }
+    
+    private func collectionViewContentOffsetChanged() -> Observable<Void> {
+        return mainView.collectionView.rx.contentOffset
+            .withUnretained(self)
+            .filter { (self, offset) in
+                guard self.mainView.collectionView.contentSize.height != 0 else {
+                    return false
+                }
+                return self.mainView.collectionView.frame.height + offset.y + 150 >= self.mainView.collectionView.contentSize.height
+            }
+            .map { _ in }
     }
 
 }
+

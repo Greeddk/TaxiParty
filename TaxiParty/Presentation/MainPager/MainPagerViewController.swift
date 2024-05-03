@@ -26,11 +26,6 @@ final class MainPagerViewController: BaseViewController {
         self.present(hostingController, animated: false)
     }
     
-    func didCompletePost() {
-        tabView.updateIndex(index: 0)
-        print("실행됨2222")
-    }
-    
 }
 
 struct tabSwiftUIView: View {
@@ -115,8 +110,4 @@ struct tabSwiftUIView: View {
             .scaleEffect(1.3)
     }
     
-    func updateIndex(index: Int) {
-        self.selectedIndex = index
-        print(selectedIndex)
-    }
 }

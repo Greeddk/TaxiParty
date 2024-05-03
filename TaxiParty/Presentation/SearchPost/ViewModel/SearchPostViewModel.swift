@@ -15,6 +15,7 @@ final class SearchPostViewModel: ViewModelProtocol {
     
     struct Input {
         let fetchDataTrigger: Observable<Void>
+        let paginationTrigger: Observable<Void>
     }
     
     struct Output {
@@ -23,17 +24,38 @@ final class SearchPostViewModel: ViewModelProtocol {
     
     func transform(input: Input) -> Output {
         
+        let nextCursor = PublishRelay<String>()
+        var dataSource: [Post] = []
         let fetchedData = PublishRelay<[Post]>()
         
         input.fetchDataTrigger
             .flatMap {
-                return NetworkManager.shared.callRequest(type: FetchPostModel.self, router: APIRouter.postRouter(.fetchPost).convertToURLRequest())
+                return NetworkManager.shared.callRequest(type: FetchPostModel.self, router: APIRouter.postRouter(.fetchPost(next: "")).convertToURLRequest())
             }
             .bind(with: self) { owner, response in
                 switch response {
                 case .success(let success):
-                    print(success.data)
-                    fetchedData.accept(success.data)
+                    dataSource.append(contentsOf: success.data)
+                    fetchedData.accept(dataSource)
+                    nextCursor.accept(success.nextCursor)
+                case .failure(let error):
+                    print(error)
+                }
+            }
+            .disposed(by: disposeBag)
+        
+        input.paginationTrigger
+            .withLatestFrom(nextCursor)
+            .filter { $0 != "0" }
+            .flatMapLatest { nextCursor in
+                return NetworkManager.shared.callRequest(type: FetchPostModel.self, router: APIRouter.postRouter(.fetchPost(next: nextCursor)).convertToURLRequest())
+            }
+            .bind(with: self) { owner, response in
+                switch response {
+                case .success(let success):
+                    dataSource.append(contentsOf: success.data)
+                    fetchedData.accept(dataSource)
+                    nextCursor.accept(success.nextCursor)
                 case .failure(let error):
                     print(error)
                 }

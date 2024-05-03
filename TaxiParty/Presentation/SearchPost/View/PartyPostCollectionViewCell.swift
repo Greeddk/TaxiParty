@@ -66,8 +66,8 @@ final class PartyPostCollectionViewCell: BaseCollectionViewCell {
     
     override func setConstraints() {
         backView.snp.makeConstraints { make in
-            make.center.equalTo(self)
-            make.width.equalTo(300)
+            make.centerX.equalTo(contentView.safeAreaLayoutGuide)
+            make.horizontalEdges.equalTo(contentView.safeAreaLayoutGuide).inset(30)
             make.height.equalTo(200)
         }
         creatorImage.snp.makeConstraints { make in
@@ -93,6 +93,7 @@ final class PartyPostCollectionViewCell: BaseCollectionViewCell {
         }
         startPointLabel.snp.makeConstraints { make in
             make.leading.equalTo(startPointIcon.snp.trailing).offset(12)
+            make.trailing.equalTo(backView.snp.trailing).offset(-12)
             make.centerY.equalTo(startPointIcon)
         }
         startInfoLabel.snp.makeConstraints { make in
@@ -107,6 +108,7 @@ final class PartyPostCollectionViewCell: BaseCollectionViewCell {
         }
         destinationLabel.snp.makeConstraints { make in
             make.leading.equalTo(startPointLabel)
+            make.trailing.equalTo(backView.snp.trailing).offset(-12)
             make.centerY.equalTo(destinationIcon)
         }
         destinationInfoLabel.snp.makeConstraints { make in
@@ -133,4 +135,13 @@ final class PartyPostCollectionViewCell: BaseCollectionViewCell {
         destinationLabel.text = post.destinationData
         leftNum.text = "\((Int(post.numberOfPeople) ?? 4) - 1 - post.together.count)명 남음"
     }
+    
+    private func parsingData(data: String) {
+        
+    }
+    
+    private func calculateLeftTime() {
+        
+    }
+    
 }
