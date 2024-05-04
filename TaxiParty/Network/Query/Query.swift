@@ -41,3 +41,11 @@ struct PostQuery: HTTPBodyProtocol {
         case productId = "product_id"
     }
 }
+
+struct JoinPartyQuery: HTTPBodyProtocol {
+    let likeStatus: Bool
+    
+    enum CodingKeys: String, CodingKey {
+        case likeStatus = "like_status"
+    }
+}

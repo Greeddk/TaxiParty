@@ -25,9 +25,13 @@ struct TokenDefaults<T> {
 
 enum TokenManager {
     enum Key: String {
+        case userId
         case accessToken
         case refreshToken
     }
+    
+    @TokenDefaults(key: Key.userId.rawValue, defaultValue: "id 없음")
+    static var userId
     
     @TokenDefaults(key: Key.accessToken.rawValue, defaultValue: "액세스 토큰 없음")
     static var accessToken

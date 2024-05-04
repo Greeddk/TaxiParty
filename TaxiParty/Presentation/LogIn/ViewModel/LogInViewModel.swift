@@ -51,6 +51,7 @@ final class LogInViewModel: ViewModelProtocol {
                     print(success)
                     TokenManager.accessToken = success.accessToken
                     TokenManager.refreshToken = success.refreshToken
+                    TokenManager.userId = success.user_id
                     indicatorTrigger.accept(false)
                     loginSuccessTrigger.accept(true)
                 case .failure(let error):

@@ -12,14 +12,15 @@ import RxCocoa
 final class PostDetailViewModel: ViewModelProtocol {
     
     var disposeBag = DisposeBag()
-    let postItem: Post
+    private var postItem: Post
     
     init(postItem: Post) {
         self.postItem = postItem
     }
     
     struct Input {
-        
+        let viewDidLoadTrigger: Observable<Void>
+        let joinButtonTapped: Observable<Void>
     }
     
     struct Output {
@@ -27,7 +28,9 @@ final class PostDetailViewModel: ViewModelProtocol {
         let directionInfo: Driver<DirectionModel>
         let startPlace: Driver<String>
         let destinationPlace: Driver<String>
-        let joinPeopleNum: Driver<String>
+        let joinPeopleNum: Driver<Int>
+        let joinStatus: Driver<Bool>
+        let disableButton: Driver<Bool>
     }
     
     func transform(input: Input) -> Output {
@@ -36,10 +39,29 @@ final class PostDetailViewModel: ViewModelProtocol {
         let directionInfo = PublishRelay<DirectionModel>()
         let startPlace = PublishRelay<String>()
         let destinationPlace = PublishRelay<String>()
-        let numberOfPeople = PublishRelay<String>()
+        let JoinPeopleNum = PublishRelay<Int>()
+        let joinStatus = PublishRelay<Bool>()
+        let refreshPostTrigger = PublishRelay<Void>()
+        let disableButton = PublishRelay<Bool>()
+        
+        input.viewDidLoadTrigger
+            .withLatestFrom(item)
+            .bind(with: self) { owner, item in
+                if item.creator.user_id == TokenManager.userId {
+                    disableButton.accept(false)
+                } else {
+                    disableButton.accept(true)
+                }
+                
+                if item.together.contains(TokenManager.userId) {
+                    joinStatus.accept(true)
+                }
+                
+            }
+            .disposed(by: disposeBag)
         
         item.asObservable()
-            .flatMap { item -> PrimitiveSequence<SingleTrait, (startPlaceName: String, destinationName: String, numberOfPeople: String, response: Result<DirectionModel, NetworkError>)> in
+            .flatMap { item -> PrimitiveSequence<SingleTrait, (startPlaceName: String, destinationName: String, numberOfPeople: Int, response: Result<DirectionModel, NetworkError>)> in
                 
                 let startData = item.startPlaceData.split(separator: ",")
                 let startCoords = "\(startData[1]),\(startData[2])"
@@ -49,13 +71,13 @@ final class PostDetailViewModel: ViewModelProtocol {
                 
                 return NetworkManager.shared.callGeocodingRequest(type: DirectionModel.self, router: APIRouter.geocodingRouter(.fetchDirection(start: startCoords, goal: destiCoords)).convertToURLRequest())
                     .map { response in
-                        return (String(startData[0]), String(destiData[0]), item.numberOfPeople, response)
+                        return (String(startData[0]), String(destiData[0]), item.together.count, response)
                     }
             }
             .subscribe(onNext: { values in
                 startPlace.accept(values.startPlaceName)
                 destinationPlace.accept(values.destinationName)
-                numberOfPeople.accept(values.numberOfPeople)
+                JoinPeopleNum.accept(values.numberOfPeople)
                 switch values.response {
                 case .success(let success):
                     directionInfo.accept(success)
@@ -64,14 +86,48 @@ final class PostDetailViewModel: ViewModelProtocol {
                 }
             })
             .disposed(by: disposeBag)
-
+        
+        input.joinButtonTapped
+            .flatMap {
+                let status = self.postItem.together.contains(TokenManager.userId)
+                print(status)
+                return NetworkManager.shared.callRequest(type: JoinPartyModel.self, router: APIRouter.postRouter(.joinParty(postId: self.postItem.postId, status: JoinPartyQuery(likeStatus: !status))).convertToURLRequest())
+            }
+            .bind(with: self) { owner, response in
+                switch response {
+                case .success(let success):
+                    joinStatus.accept(success.likeStatus)
+                    refreshPostTrigger.accept(())
+                case .failure(let error):
+                    print(error)
+                }
+            }
+            .disposed(by: disposeBag)
+        
+        refreshPostTrigger.asObservable()
+            .flatMap {
+                return NetworkManager.shared.callRequest(type: Post.self, router: APIRouter.postRouter(.getOnePost(postId: self.postItem.postId)).convertToURLRequest())
+            }
+            .bind(with: self) { owner, response in
+                switch response {
+                case .success(let success):
+                    owner.postItem = success
+                    JoinPeopleNum.accept(success.together.count)
+                case .failure(let error):
+                    print(error)
+                }
+            }
+            .disposed(by: disposeBag)
+        
         
         return Output(
             item: item.asDriver(onErrorJustReturn: Post(postId: "", title: "", startPlaceData: "", destinationData: "", numberOfPeople: "", dueDate: "", productId: "", createdAt: "", creator: Creator(user_id: "", nick: "", profileImage: ""), together: [])),
             directionInfo: directionInfo.asDriver(onErrorJustReturn: DirectionModel(message: "", route: Route(trafast: []))),
             startPlace: startPlace.asDriver(onErrorJustReturn: ""),
             destinationPlace: destinationPlace.asDriver(onErrorJustReturn: ""),
-            joinPeopleNum: numberOfPeople.asDriver(onErrorJustReturn: "")
+            joinPeopleNum: JoinPeopleNum.asDriver(onErrorJustReturn: 0),
+            joinStatus: joinStatus.asDriver(onErrorJustReturn: false),
+            disableButton: disableButton.asDriver(onErrorJustReturn: false)
         )
     }
     

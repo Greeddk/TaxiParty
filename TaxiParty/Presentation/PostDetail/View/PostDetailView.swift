@@ -181,13 +181,13 @@ final class PostDetailView: BaseView {
         }
     }
     
-    func configureCell(item: Post, startPlace: String, destination: String) {
+    func configureCell(item: Post, startPlace: String, destination: String, togetherNum: Int) {
         title.text = item.title
         startPointLabel.text = startPlace
         destinationLabel.text = destination
-        dueDate.text = item.dueDate
-        var leftJoinNum = (Int(item.numberOfPeople) ?? 4) - 1 - item.together.count
-        joinNumLabel.text = "\(item.numberOfPeople) 자리 중 \(leftJoinNum) 자리 남음"
+        dueDate.text = calculateLeftTime(item.dueDate) 
+        let availableNum = (Int(item.numberOfPeople) ?? 4) - 1 - togetherNum
+        joinNumLabel.text = availableNum <= 0 ? "마감" : "\(item.numberOfPeople) 자리 중 \(availableNum) 자리 남음"
     }
     
     func updateMapView(item: DirectionModel, currentNum: String) {

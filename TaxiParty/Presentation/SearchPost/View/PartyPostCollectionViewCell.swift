@@ -140,16 +140,4 @@ final class PartyPostCollectionViewCell: BaseCollectionViewCell {
         dueDateLabel.text = calculateLeftTime(post.dueDate) + " 출발"
     }
     
-    private func calculateLeftTime(_ dateString: String) -> String {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss Z"
-        let convertDate = dateFormatter.date(from: dateString)
-        
-        let targetFormatter = DateFormatter()
-        targetFormatter.dateFormat = "yyyy/MM/dd/ a hh:mm"
-        targetFormatter.locale = Locale(identifier: "ko_KR")
-        
-        return targetFormatter.string(from: convertDate ?? Date())
-    }
-    
 }

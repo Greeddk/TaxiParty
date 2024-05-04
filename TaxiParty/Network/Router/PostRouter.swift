@@ -11,6 +11,8 @@ import Alamofire
 enum PostRouter {
     case fetchPost(next: String)
     case writePost(query: PostQuery)
+    case joinParty(postId: String, status: JoinPartyQuery)
+    case getOnePost(postId: String)
 }
 
 extension PostRouter: RouterType {
@@ -25,6 +27,10 @@ extension PostRouter: RouterType {
             return .get
         case .writePost:
             return .post
+        case .joinParty:
+            return .post
+        case .getOnePost:
+            return .get
         }
     }
     
@@ -34,6 +40,10 @@ extension PostRouter: RouterType {
             return "/v1/posts"
         case .writePost:
             return "/v1/posts"
+        case .joinParty(let postId, _):
+            return "/v1/posts/\(postId)/like"
+        case .getOnePost(let postId):
+            return "/v1/posts/\(postId)"
         }
     }
     
@@ -46,6 +56,13 @@ extension PostRouter: RouterType {
             return [HTTPHeader.authorization.rawValue: TokenManager.accessToken,
                     HTTPHeader.sesacKey.rawValue: APIKey.sesacKey.rawValue,
                     HTTPHeader.contentType.rawValue: HTTPHeader.json.rawValue]
+        case .joinParty:
+            return [HTTPHeader.authorization.rawValue: TokenManager.accessToken,
+                    HTTPHeader.sesacKey.rawValue: APIKey.sesacKey.rawValue,
+                    HTTPHeader.contentType.rawValue: HTTPHeader.json.rawValue]
+        case .getOnePost(postId: let postId):
+            return [HTTPHeader.authorization.rawValue: TokenManager.accessToken,
+                    HTTPHeader.sesacKey.rawValue: APIKey.sesacKey.rawValue]
         }
     }
     
@@ -64,6 +81,10 @@ extension PostRouter: RouterType {
             return queryItem
         case .writePost:
             return nil
+        case .joinParty:
+            return nil
+        case .getOnePost(postId: let postId):
+            return nil
         }
     }
     
@@ -74,6 +95,11 @@ extension PostRouter: RouterType {
         case .writePost(let query):
             let encoder = JSONEncoder()
             return try? encoder.encode(query)
+        case .joinParty(_, let status):
+            let encoder = JSONEncoder()
+            return try? encoder.encode(status)
+        case .getOnePost(postId: let postId):
+            return nil
         }
     }
 }
