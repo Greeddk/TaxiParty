@@ -68,7 +68,7 @@ final class PostDetailViewModel: ViewModelProtocol {
         
         return Output(
             item: item.asDriver(onErrorJustReturn: Post(postId: "", title: "", startPlaceData: "", destinationData: "", numberOfPeople: "", dueDate: "", productId: "", createdAt: "", creator: Creator(user_id: "", nick: "", profileImage: ""), together: [])),
-            directionInfo: directionInfo.asDriver(onErrorJustReturn: DirectionModel(message: "", route: Route(traoptimal: []))),
+            directionInfo: directionInfo.asDriver(onErrorJustReturn: DirectionModel(message: "", route: Route(trafast: []))),
             startPlace: startPlace.asDriver(onErrorJustReturn: ""),
             destinationPlace: destinationPlace.asDriver(onErrorJustReturn: ""),
             joinPeopleNum: numberOfPeople.asDriver(onErrorJustReturn: "")

@@ -92,9 +92,9 @@ final class PartyPostCollectionViewCell: BaseCollectionViewCell {
             make.size.equalTo(24)
         }
         startPointLabel.snp.makeConstraints { make in
+            make.top.equalTo(startPointIcon)
             make.leading.equalTo(startPointIcon.snp.trailing).offset(12)
             make.trailing.equalTo(backView.snp.trailing).offset(-12)
-            make.centerY.equalTo(startPointIcon)
         }
         startInfoLabel.snp.makeConstraints { make in
             make.top.equalTo(startPointLabel.snp.bottom).offset(0)
@@ -107,9 +107,9 @@ final class PartyPostCollectionViewCell: BaseCollectionViewCell {
             make.height.equalTo(24)
         }
         destinationLabel.snp.makeConstraints { make in
+            make.top.equalTo(destinationIcon)
             make.leading.equalTo(startPointLabel)
             make.trailing.equalTo(backView.snp.trailing).offset(-12)
-            make.centerY.equalTo(destinationIcon)
         }
         destinationInfoLabel.snp.makeConstraints { make in
             make.top.equalTo(destinationLabel.snp.bottom).offset(0)
@@ -131,17 +131,25 @@ final class PartyPostCollectionViewCell: BaseCollectionViewCell {
         title.text = post.title
         creatorImage.image = UIImage(systemName: "person")
         creatorNick.text = post.creator.nick
-        startPointLabel.text = post.startPlaceData
-        destinationLabel.text = post.destinationData
-        leftNum.text = "\((Int(post.numberOfPeople) ?? 4) - 1 - post.together.count)명 남음"
+        let startPlaceData = post.startPlaceData.split(separator: ",")
+        startPointLabel.text = String(startPlaceData[0])
+        let destinationData = post.destinationData.split(separator: ",")
+        destinationLabel.text = String(destinationData[0])
+        let availableNum = (Int(post.numberOfPeople) ?? 4) - 1 - post.together.count
+        leftNum.text = availableNum <= 0 ? "마감!" : "\(availableNum)자리 남음"
+        dueDateLabel.text = calculateLeftTime(post.dueDate) + " 출발"
     }
     
-    private func parsingData(data: String) {
+    private func calculateLeftTime(_ dateString: String) -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss Z"
+        let convertDate = dateFormatter.date(from: dateString)
         
-    }
-    
-    private func calculateLeftTime() {
+        let targetFormatter = DateFormatter()
+        targetFormatter.dateFormat = "yyyy/MM/dd/ a hh:mm"
+        targetFormatter.locale = Locale(identifier: "ko_KR")
         
+        return targetFormatter.string(from: convertDate ?? Date())
     }
     
 }

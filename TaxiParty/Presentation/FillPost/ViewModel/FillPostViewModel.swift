@@ -156,7 +156,7 @@ final class FillPostViewModel: ViewModelProtocol {
             enableMinusButton: enableMinusButton.asDriver(onErrorJustReturn: false),
             postComplete: postComplete.asDriver(onErrorJustReturn: false),
             errorAlertTrigger: errorAlertTrigger.asDriver(onErrorJustReturn: false),
-            directionInfo: directionInfo.asDriver(onErrorJustReturn: DirectionModel(message: "", route: Route(traoptimal: [])))
+            directionInfo: directionInfo.asDriver(onErrorJustReturn: DirectionModel(message: "", route: Route(trafast: [])))
         )
     }
 

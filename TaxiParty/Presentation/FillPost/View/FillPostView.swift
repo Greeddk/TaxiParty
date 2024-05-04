@@ -209,9 +209,9 @@ final class FillPostView: BaseView {
     
     func updateMapView(item: DirectionModel, currentNum: String) {
         mapView.updateMapRoute(item: item)
-        taxiFareLabel.text = "\(item.route.traoptimal[0].summary.taxiFare)원"
+        taxiFareLabel.text = "\(item.route.trafast[0].summary.taxiFare)원"
         taxiFarePerOneLabel.text =
-        "\(item.route.traoptimal[0].summary.taxiFare / (Int(currentNum) ?? 4))원"
+        "\(item.route.trafast[0].summary.taxiFare / (Int(currentNum) ?? 4))원"
     }
     
 }

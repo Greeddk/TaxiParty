@@ -88,7 +88,8 @@ extension GeocodingRouter: RouterType {
             return queryItem
         case .fetchDirection(let start, let goal):
             let queryItem = [URLQueryItem(name: "start", value: start),
-                             URLQueryItem(name: "goal", value: goal)]
+                             URLQueryItem(name: "goal", value: goal),
+                             URLQueryItem(name: "option", value: "trafast")]
             return queryItem
         }
     }

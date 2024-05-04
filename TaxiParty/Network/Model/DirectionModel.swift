@@ -13,10 +13,10 @@ struct DirectionModel: Decodable {
 }
 
 struct Route: Decodable {
-    let traoptimal: [Traoptimal]
+    let trafast: [Trafast]
 }
 
-struct Traoptimal: Decodable {
+struct Trafast: Decodable {
     let summary: Summary
     let path: [[Double]]
 }

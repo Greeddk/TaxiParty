@@ -108,9 +108,9 @@ final class PostDetailView: BaseView {
             make.size.equalTo(24)
         }
         startPointLabel.snp.makeConstraints { make in
+            make.top.equalTo(startPointIcon)
             make.leading.equalTo(startPointIcon.snp.trailing).offset(12)
             make.trailing.lessThanOrEqualTo(taxiFareInfoLabel.snp.leading)
-            make.centerY.equalTo(startPointIcon)
         }
         startInfoLabel.snp.makeConstraints { make in
             make.top.equalTo(startPointLabel.snp.bottom).offset(0)
@@ -123,9 +123,9 @@ final class PostDetailView: BaseView {
             make.height.equalTo(24)
         }
         destinationLabel.snp.makeConstraints { make in
+            make.top.equalTo(destinationIcon)
             make.leading.equalTo(startPointLabel)
             make.trailing.lessThanOrEqualTo(taxiFarePerOneInfoLabel.snp.leading)
-            make.centerY.equalTo(destinationIcon)
         }
         destinationInfoLabel.snp.makeConstraints { make in
             make.top.equalTo(destinationLabel.snp.bottom).offset(0)
@@ -192,9 +192,9 @@ final class PostDetailView: BaseView {
     
     func updateMapView(item: DirectionModel, currentNum: String) {
         mapView.updateMapRoute(item: item)
-        taxiFareLabel.text = "\(item.route.traoptimal[0].summary.taxiFare)원"
+        taxiFareLabel.text = "\(item.route.trafast[0].summary.taxiFare)원"
         taxiFarePerOneLabel.text =
-        "\(item.route.traoptimal[0].summary.taxiFare / (Int(currentNum) ?? 4))원"
+        "\(item.route.trafast[0].summary.taxiFare / (Int(currentNum) ?? 4))원"
     }
     
 }
