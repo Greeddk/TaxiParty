@@ -53,11 +53,14 @@ final class ModifyProfileView: BaseView {
     
     func configureProfile(profile: ProfileModel) {
         nicknameTextField.text = profile.nick
-        guard let url = URL(string: APIKey.baseURL.rawValue + "/v1/" +  profile.profileImage!) else { return }
+        guard let url = URL(string: APIKey.baseURL.rawValue + "/v1/" +  (profile.profileImage ?? "default")) else { return }
         let options: KingfisherOptionsInfo = [
             .requestModifier(ImageDownloadRequest())
         ]
         profileImageView.kf.setImage(with: url, options: options)
+        if url.absoluteString == APIKey.baseURL.rawValue + "/v1/" + "default" {
+            profileImageView.image = UIImage(named: "defaultProfile")
+        }
     }
     
 }

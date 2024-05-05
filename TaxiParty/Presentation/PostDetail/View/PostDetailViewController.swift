@@ -26,7 +26,6 @@ final class PostDetailViewController: BaseViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        navigationController?.isNavigationBarHidden = false
         setNavigationBackButton()
         viewDidLoadTrigger.accept(())
     }
@@ -40,7 +39,17 @@ final class PostDetailViewController: BaseViewController {
         
         let output = viewModel.transform(input: input)
         
-        output.disableButton
+        output.availableJoin
+            .drive(with: self) { owner, value in
+                owner.mainView.joinButton.isEnabled = value
+                if !value {
+                    owner.mainView.joinButton.setTitle("자리가 꽉 찼어요!", for: .normal)
+                    owner.mainView.joinButton.backgroundColor = .systemGray2
+                }
+            }
+            .disposed(by: disposeBag)
+        
+        output.enableButton
             .drive(with: self, onNext: { owner, value in
                 owner.mainView.joinButton.isEnabled = value
                 if !value {

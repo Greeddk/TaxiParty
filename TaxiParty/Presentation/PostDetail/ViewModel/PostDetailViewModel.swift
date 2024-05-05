@@ -30,7 +30,8 @@ final class PostDetailViewModel: ViewModelProtocol {
         let destinationPlace: Driver<String>
         let joinPeopleNum: Driver<Int>
         let joinStatus: Driver<Bool>
-        let disableButton: Driver<Bool>
+        let enableButton: Driver<Bool>
+        let availableJoin: Driver<Bool>
     }
     
     func transform(input: Input) -> Output {
@@ -42,19 +43,24 @@ final class PostDetailViewModel: ViewModelProtocol {
         let JoinPeopleNum = PublishRelay<Int>()
         let joinStatus = PublishRelay<Bool>()
         let refreshPostTrigger = PublishRelay<Void>()
-        let disableButton = PublishRelay<Bool>()
+        let enableButton = PublishRelay<Bool>()
+        let availableJoin = PublishRelay<Bool>()
         
         input.viewDidLoadTrigger
             .withLatestFrom(item)
             .bind(with: self) { owner, item in
                 if item.creator.user_id == TokenManager.userId {
-                    disableButton.accept(false)
+                    enableButton.accept(false)
                 } else {
-                    disableButton.accept(true)
+                    enableButton.accept(true)
                 }
                 
                 if item.together.contains(TokenManager.userId) {
                     joinStatus.accept(true)
+                }
+                
+                if item.together.count + 1 == Int(item.numberOfPeople) {
+                    availableJoin.accept(false)
                 }
                 
             }
@@ -127,7 +133,8 @@ final class PostDetailViewModel: ViewModelProtocol {
             destinationPlace: destinationPlace.asDriver(onErrorJustReturn: ""),
             joinPeopleNum: JoinPeopleNum.asDriver(onErrorJustReturn: 0),
             joinStatus: joinStatus.asDriver(onErrorJustReturn: false),
-            disableButton: disableButton.asDriver(onErrorJustReturn: false)
+            enableButton: enableButton.asDriver(onErrorJustReturn: true),
+            availableJoin: availableJoin.asDriver(onErrorJustReturn: true)
         )
     }
     

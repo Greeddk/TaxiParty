@@ -8,6 +8,7 @@
 import UIKit
 import SnapKit
 import Then
+import Kingfisher
 
 final class PartyPostCollectionViewCell: BaseCollectionViewCell {
     
@@ -53,7 +54,7 @@ final class PartyPostCollectionViewCell: BaseCollectionViewCell {
         $0.text = "도착지"
     }
     let dueDateLabel = UILabel().then {
-        $0.font = .Spoqa(size: 14, weight: .regular)
+        $0.font = .Spoqa(size: 12, weight: .light)
         $0.text = "7시간 남음"
     }
     let leftNum = UILabel().then {
@@ -138,6 +139,14 @@ final class PartyPostCollectionViewCell: BaseCollectionViewCell {
         let availableNum = (Int(post.numberOfPeople) ?? 4) - 1 - post.together.count
         leftNum.text = availableNum <= 0 ? "마감!" : "\(availableNum)자리 남음"
         dueDateLabel.text = calculateLeftTime(post.dueDate) + " 출발"
+        guard let url = URL(string: APIKey.baseURL.rawValue + "/v1/" +  (post.creator.profileImage ?? "default")) else { return }
+        let options: KingfisherOptionsInfo = [
+            .requestModifier(ImageDownloadRequest())
+        ]
+        creatorImage.kf.setImage(with: url, options: options)
+        if url.absoluteString == APIKey.baseURL.rawValue + "/v1/" + "default" {
+            creatorImage.image = UIImage(named: "defaultProfile")
+        }
     }
     
 }

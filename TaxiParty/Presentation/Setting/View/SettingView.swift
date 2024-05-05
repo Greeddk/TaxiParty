@@ -80,7 +80,7 @@ final class SettingView: BaseView {
         }
         phoneLabel.snp.makeConstraints { make in
             make.leading.equalTo(phoneIcon.snp.trailing).offset(4)
-            make.top.equalTo(phoneIcon)
+            make.centerY.equalTo(phoneIcon)
         }
         editButton.snp.makeConstraints { make in
             make.trailing.equalTo(backView).offset(-18)
@@ -96,10 +96,13 @@ final class SettingView: BaseView {
         nicknameLabel.text = profile.nick
         emailLabel.text = profile.email
         phoneLabel.text = profile.phoneNum
-        guard let url = URL(string: APIKey.baseURL.rawValue + "/v1/" +  profile.profileImage!) else { return }
+        guard let url = URL(string: APIKey.baseURL.rawValue + "/v1/" +  (profile.profileImage ?? "default")) else { return }
         let options: KingfisherOptionsInfo = [
             .requestModifier(ImageDownloadRequest())
         ]
         profileImageView.kf.setImage(with: url, options: options)
+        if url.absoluteString == APIKey.baseURL.rawValue + "/v1/" + "default" {
+            profileImageView.image = UIImage(named: "defaultProfile")
+        }
     }
 }
