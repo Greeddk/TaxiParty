@@ -53,16 +53,11 @@ final class ModifyProfileView: BaseView {
     
     func configureProfile(profile: ProfileModel) {
         nicknameTextField.text = profile.nick
-        guard let profileImage = profile.profileImage else { return }
-        let url = URL(string: APIKey.baseURL.rawValue + profileImage)
-        let imageLoadRequest = AnyModifier { request in
-            var requestBody = request
-            requestBody.setValue(TokenManager.accessToken, forHTTPHeaderField: HTTPHeader.authorization.rawValue)
-            requestBody.setValue(APIKey.sesacKey.rawValue, forHTTPHeaderField: HTTPHeader.sesacKey.rawValue)
-            requestBody.setValue(HTTPHeader.json.rawValue, forHTTPHeaderField: HTTPHeader.contentType.rawValue)
-            return requestBody
-        }
-        profileImageView.kf.setImage(with: url, options: [.requestModifier(imageLoadRequest)])
+        guard let url = URL(string: APIKey.baseURL.rawValue + "/v1/" +  profile.profileImage!) else { return }
+        let options: KingfisherOptionsInfo = [
+            .requestModifier(ImageDownloadRequest())
+        ]
+        profileImageView.kf.setImage(with: url, options: options)
     }
     
 }

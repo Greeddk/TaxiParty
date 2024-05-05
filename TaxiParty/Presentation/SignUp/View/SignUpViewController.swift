@@ -86,7 +86,7 @@ final class SignUpViewController: BaseViewController {
         output.completeSignUpTrigger
             .drive(with: self, onNext: { owner, value in
                 if value {
-                    owner.navigationController?.pushViewController(CompleteSignUpViewController(), animated: true)
+                    
                 }
             })
             .disposed(by: disposeBag)

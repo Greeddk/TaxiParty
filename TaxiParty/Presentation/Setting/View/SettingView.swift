@@ -8,6 +8,7 @@
 import UIKit
 import Then
 import SnapKit
+import Kingfisher
 
 final class SettingView: BaseView {
 
@@ -20,7 +21,11 @@ final class SettingView: BaseView {
         $0.layer.shadowRadius = 7
         $0.layer.shadowOffset = CGSize(width: 0, height: 3)
     }
-    private let profileImageView = RoundImageView(frame: .zero)
+    private let profileImageView = RoundImageView(frame: .zero).then {
+        $0.layer.borderWidth = 1
+        $0.layer.borderColor = UIColor.pointPurple.cgColor
+        $0.contentMode = .scaleAspectFill
+    }
     private let nicknameLabel = UILabel().then {
         $0.font = .Spoqa(size: 20, weight: .bold)
     }
@@ -88,9 +93,13 @@ final class SettingView: BaseView {
     }
     
     func configureView(profile: ProfileModel) {
-        profileImageView.image = UIImage(systemName: "star")
         nicknameLabel.text = profile.nick
         emailLabel.text = profile.email
         phoneLabel.text = profile.phoneNum
+        guard let url = URL(string: APIKey.baseURL.rawValue + "/v1/" +  profile.profileImage!) else { return }
+        let options: KingfisherOptionsInfo = [
+            .requestModifier(ImageDownloadRequest())
+        ]
+        profileImageView.kf.setImage(with: url, options: options)
     }
 }

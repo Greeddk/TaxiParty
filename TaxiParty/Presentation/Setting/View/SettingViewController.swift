@@ -10,6 +10,10 @@ import SwiftUI
 import RxSwift
 import RxCocoa
 
+protocol fetchNewData {
+    func fetch()
+}
+
 struct SettingRepresentableView: UIViewControllerRepresentable {
 
     func makeUIViewController(context: Context) -> some UIViewController {
@@ -22,12 +26,12 @@ struct SettingRepresentableView: UIViewControllerRepresentable {
     
 }
 
-final class SettingViewController: BaseViewController {
+final class SettingViewController: BaseViewController, fetchNewData {
 
     let mainView = SettingView()
     let viewModel = SettingViewModel()
     
-    let viewDidLoadTrigger = PublishRelay<Void>()
+    let fetchDataTrigger = PublishRelay<Void>()
     
     override func loadView() {
         self.view = mainView
@@ -35,7 +39,7 @@ final class SettingViewController: BaseViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        viewDidLoadTrigger.accept(())
+        fetchDataTrigger.accept(())
     }
     
     override func bind() {
@@ -43,7 +47,7 @@ final class SettingViewController: BaseViewController {
         let withdrawTrigger = PublishRelay<Void>()
         
         let input = SettingViewModel.Input(
-            fetchProfile: viewDidLoadTrigger.asObservable(),
+            fetchProfile: fetchDataTrigger.asObservable(),
             withdrawButtonTapped: mainView.withdrawButton.rx.tap.asObservable(),
             withdrawTrigger: withdrawTrigger.asObservable(),
             modifyButtonTapped: mainView.editButton.rx.tap.asObservable())
@@ -75,12 +79,18 @@ final class SettingViewController: BaseViewController {
             .disposed(by: disposeBag)
         
         output.moveToModifyPage
+            .withLatestFrom(output.profileInfo) { ($0, $1) }
+            .map { (value: $0.0, profile: $0.1) }
             .drive(with: self) { owner, value in
-                if value {
-                    owner.navigationController?.pushViewController(ModifyProfileViewController(), animated: true)
+                if value.value {
+                    let modifyViewModel = ModifyProfileViewModel(profileData: value.profile)
+                    let modifyVC = ModifyProfileViewController(viewModel: modifyViewModel)
+                    modifyVC.delegate = self
+                    owner.navigationController?.pushViewController(modifyVC, animated: true)
                 }
             }
             .disposed(by: disposeBag)
+
         
     }
     
@@ -95,4 +105,7 @@ final class SettingViewController: BaseViewController {
         present(alert, animated: true)
     }
 
+    func fetch() {
+        fetchDataTrigger.accept(())
+    }
 }

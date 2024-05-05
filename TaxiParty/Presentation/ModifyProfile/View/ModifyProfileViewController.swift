@@ -14,7 +14,14 @@ import PhotosUI
 final class ModifyProfileViewController: BaseViewController {
     
     let mainView = ModifyProfileView()
-    let viewModel = ModifyProfileViewModel()
+    let viewModel: ModifyProfileViewModel
+    var delegate: fetchNewData?
+    let fetchDataTrigger = PublishRelay<Void>()
+    
+    init(viewModel: ModifyProfileViewModel) {
+        self.viewModel = viewModel
+        super.init()
+    }
     
     override func loadView() {
         self.view = mainView
@@ -24,6 +31,7 @@ final class ModifyProfileViewController: BaseViewController {
         super.viewDidLoad()
         hideKeyboardWhenViewIsTapped()
         setNavigationBackButton()
+        fetchDataTrigger.accept(())
     }
     
     override func bind() {
@@ -31,10 +39,17 @@ final class ModifyProfileViewController: BaseViewController {
         let input = ModifyProfileViewModel.Input(
             profileImageTapped: mainView.profileImageView.rx.tapGesture().when(.recognized),
             nicknameTextFieldText: mainView.nicknameTextField.rx.text.orEmpty.asObservable(),
-            modifyButtonTapped: mainView.modifyButton.rx.tap.asObservable()
+            modifyButtonTapped: mainView.modifyButton.rx.tap.asObservable(),
+            fetchDataTrigger: fetchDataTrigger.asObservable()
         )
         
         let output = viewModel.transform(input: input)
+        
+        output.profileData
+            .drive(with: self) { owner, profile in
+                owner.mainView.configureProfile(profile: profile)
+            }
+            .disposed(by: disposeBag)
         
         output.openImagePickerTrigger
             .drive(with: self) { owner, value in
@@ -44,7 +59,8 @@ final class ModifyProfileViewController: BaseViewController {
         
         output.backToSettingViewTrigger
             .drive(with: self) { owner, _ in
-                owner.navigationController?.dismiss(animated: true)
+                owner.delegate?.fetch()
+                owner.navigationController?.popViewController(animated: true)
             }
             .disposed(by: disposeBag)
         
