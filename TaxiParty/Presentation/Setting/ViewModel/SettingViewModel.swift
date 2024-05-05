@@ -17,18 +17,21 @@ final class SettingViewModel: ViewModelProtocol {
         let fetchProfile: Observable<Void>
         let withdrawButtonTapped: Observable<Void>
         let withdrawTrigger: Observable<Void>
+        let modifyButtonTapped: Observable<Void>
     }
     
     struct Output {
         let profileInfo: Driver<ProfileModel>
         let showAlertTrigger: Driver<Void>
         let withdrawComplete: Driver<Void>
+        let moveToModifyPage: Driver<Bool>
     }
     
     func transform(input: Input) -> Output {
         
         let profileInfo = PublishRelay<ProfileModel>()
         let withdrawComplete = PublishRelay<Void>()
+        let moveToModifyPage = PublishRelay<Bool>()
         
         input.fetchProfile
             .flatMap {
@@ -73,9 +76,19 @@ final class SettingViewModel: ViewModelProtocol {
             }
             .disposed(by: disposeBag)
         
+        input.modifyButtonTapped
+            .bind { _ in
+                moveToModifyPage.accept(true)
+            }
+            .disposed(by: disposeBag)
         
-        let errorModel = ProfileModel(user_id: "", email: "", nick: "error", phoneNum: "", profileImage: "", posts: nil)
-        return Output(profileInfo: profileInfo.asDriver(onErrorJustReturn: errorModel), showAlertTrigger: input.withdrawButtonTapped.asDriver(onErrorJustReturn: ()), withdrawComplete: withdrawComplete.asDriver(onErrorJustReturn: ()))
+        
+        let errorModel = ProfileModel(user_id: "", email: "", nick: "error", phoneNum: "", profileImage: "", posts: [])
+        return Output(
+            profileInfo: profileInfo.asDriver(onErrorJustReturn: errorModel),
+            showAlertTrigger: input.withdrawButtonTapped.asDriver(onErrorJustReturn: ()),
+            withdrawComplete: withdrawComplete.asDriver(onErrorJustReturn: ()),
+            moveToModifyPage: moveToModifyPage.asDriver(onErrorJustReturn: false))
     }
     
 }

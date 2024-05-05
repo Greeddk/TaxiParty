@@ -42,7 +42,11 @@ final class SettingViewController: BaseViewController {
         
         let withdrawTrigger = PublishRelay<Void>()
         
-        let input = SettingViewModel.Input(fetchProfile: viewDidLoadTrigger.asObservable(), withdrawButtonTapped: mainView.withdrawButton.rx.tap.asObservable(), withdrawTrigger: withdrawTrigger.asObservable())
+        let input = SettingViewModel.Input(
+            fetchProfile: viewDidLoadTrigger.asObservable(),
+            withdrawButtonTapped: mainView.withdrawButton.rx.tap.asObservable(),
+            withdrawTrigger: withdrawTrigger.asObservable(),
+            modifyButtonTapped: mainView.editButton.rx.tap.asObservable())
         
         let output = viewModel.transform(input: input)
         
@@ -69,6 +73,15 @@ final class SettingViewController: BaseViewController {
                 sceneDelegate?.window?.makeKeyAndVisible()
             }
             .disposed(by: disposeBag)
+        
+        output.moveToModifyPage
+            .drive(with: self) { owner, value in
+                if value {
+                    owner.navigationController?.pushViewController(ModifyProfileViewController(), animated: true)
+                }
+            }
+            .disposed(by: disposeBag)
+        
     }
     
     func showAlert(action: @escaping () -> Void) {

@@ -66,6 +66,49 @@ final class NetworkManager {
         }
     }
     
+    func editProfile(data: Data, nick: String) -> Single<Result<ProfileModel, NetworkError>> {
+        return Single.create { single -> Disposable in
+            
+            do {
+                let urlRequest = try ProfileRouter.modifyProfile.asURLRequest()
+                print(urlRequest.url!)
+                AF.upload(multipartFormData: self.makeMultipartData(data: data, nick: nick), to: urlRequest.url!, method: .put, headers: urlRequest.headers)
+                    .validate(statusCode: 200..<300)
+                    .responseDecodable(of: ProfileModel.self) { response in
+                        switch response.result {
+                        case .success(let success):
+                            single(.success(.success(success)))
+                        case .failure(let error):
+                            print(error)
+                            let networkError: NetworkError
+                            switch error.responseCode {
+                            case 401:
+                                networkError = .invalidToken
+                            case 409:
+                                networkError = .cantUseIt
+                            case 418:
+                                networkError = .expireRefreshToken
+                            case 420:
+                                networkError = .invalidSesacKey
+                            case 429:
+                                networkError = .overCalling
+                            case 444:
+                                networkError = .invalidURL
+                            case 500:
+                                networkError = .invalidRequest
+                            default:
+                                networkError = .failedRequest
+                            }
+                            single(.success(.failure(networkError)))
+                        }
+                    }
+            } catch {
+                single(.failure(error))
+            }
+            return Disposables.create()
+        }
+    }
+    
     func callGeocodingRequest<T>(type: T.Type, router: RouterType) -> Single<Result<T, NetworkError>> where T: Decodable {
         return Single.create { single -> Disposable in
             
@@ -109,6 +152,12 @@ final class NetworkManager {
         }
     }
     
+    private func makeMultipartData(data: Data, nick: String) -> MultipartFormData {
+        let multipartData = MultipartFormData()
+        multipartData.append(nick.data(using: .utf8)!, withName: "nick")
+        multipartData.append(data, withName: "profile", fileName: TokenManager.userId + "profile.jpg", mimeType: "image/jpg")
+        return multipartData
+    }
 }
 
 final class AuthInterceptor: RequestInterceptor {

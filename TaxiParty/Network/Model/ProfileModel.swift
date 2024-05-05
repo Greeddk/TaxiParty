@@ -13,5 +13,5 @@ struct ProfileModel: Decodable {
     let nick: String
     let phoneNum: String
     let profileImage: String?
-    let posts: [String]?
+    let posts: [String]
 }

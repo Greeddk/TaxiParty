@@ -20,6 +20,7 @@ extension UIViewController {
     }
     
     func setNavigationBackButton() {
+        navigationController?.isNavigationBarHidden = false
         hideBackButton()
         let imageConfig = UIImage.SymbolConfiguration(pointSize: 19, weight: .regular)
         let image = UIImage(systemName: "arrow.backward", withConfiguration: imageConfig)
