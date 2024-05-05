@@ -18,7 +18,7 @@ final class CompleteSignUpView: BaseView {
         $0.numberOfLines = 0
     }
     let infoLabel = UILabel().then {
-        $0.font = .Spoqa(size: 15, weight: .regular)
+        $0.font = .Spoqa(size: 14, weight: .regular)
         $0.textAlignment = .center
         $0.numberOfLines = 0
     }
@@ -33,7 +33,7 @@ final class CompleteSignUpView: BaseView {
             make.horizontalEdges.equalTo(self.safeAreaLayoutGuide).inset(20)
         }
         infoLabel.snp.makeConstraints { make in
-            make.top.equalTo(completeLabel.snp.bottom).offset(20)
+            make.top.equalTo(completeLabel.snp.bottom).offset(30)
             make.horizontalEdges.equalTo(self).inset(20)
             make.centerX.equalTo(self)
         }
@@ -41,7 +41,7 @@ final class CompleteSignUpView: BaseView {
 
     override func setupAttributes() {
         completeLabel.text = "회원가입이 \n 완료되었습니다!"
-        infoLabel.text = "3초 뒤 자동으로 로그인 화면으로 이동합니다!"
+        infoLabel.text = "5초 뒤 자동으로 로그인 화면으로 이동합니다!"
     }
     
 }

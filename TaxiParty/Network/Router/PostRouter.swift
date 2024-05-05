@@ -9,7 +9,7 @@ import Foundation
 import Alamofire
 
 enum PostRouter {
-    case fetchPost(next: String)
+    case fetchPost(next: String, limit: Int)
     case writePost(query: PostQuery)
     case joinParty(postId: String, status: JoinPartyQuery)
     case getOnePost(postId: String)
@@ -60,7 +60,7 @@ extension PostRouter: RouterType {
             return [HTTPHeader.authorization.rawValue: TokenManager.accessToken,
                     HTTPHeader.sesacKey.rawValue: APIKey.sesacKey.rawValue,
                     HTTPHeader.contentType.rawValue: HTTPHeader.json.rawValue]
-        case .getOnePost(postId: let postId):
+        case .getOnePost:
             return [HTTPHeader.authorization.rawValue: TokenManager.accessToken,
                     HTTPHeader.sesacKey.rawValue: APIKey.sesacKey.rawValue]
         }
@@ -72,10 +72,10 @@ extension PostRouter: RouterType {
     
     var queryItem: [URLQueryItem]? {
         switch self {
-        case .fetchPost(let next):
+        case .fetchPost(let next, let limit):
             let queryItem = [
                 URLQueryItem(name: "product_id", value: ProductId.taxiParty.rawValue),
-                URLQueryItem(name: "limit", value: "10"),
+                URLQueryItem(name: "limit", value: "\(limit)"),
                 URLQueryItem(name: "next", value: next)
             ]
             return queryItem
@@ -83,7 +83,7 @@ extension PostRouter: RouterType {
             return nil
         case .joinParty:
             return nil
-        case .getOnePost(postId: let postId):
+        case .getOnePost:
             return nil
         }
     }
@@ -98,7 +98,7 @@ extension PostRouter: RouterType {
         case .joinParty(_, let status):
             let encoder = JSONEncoder()
             return try? encoder.encode(status)
-        case .getOnePost(postId: let postId):
+        case .getOnePost:
             return nil
         }
     }

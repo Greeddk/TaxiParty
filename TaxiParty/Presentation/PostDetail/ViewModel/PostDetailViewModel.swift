@@ -55,12 +55,13 @@ final class PostDetailViewModel: ViewModelProtocol {
                     enableButton.accept(true)
                 }
                 
-                if item.together.contains(TokenManager.userId) {
-                    joinStatus.accept(true)
-                }
-                
                 if item.together.count + 1 == Int(item.numberOfPeople) {
                     availableJoin.accept(false)
+                }
+                
+                if item.together.contains(TokenManager.userId) {
+                    joinStatus.accept(true)
+                    availableJoin.accept(true)
                 }
                 
             }
