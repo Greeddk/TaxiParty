@@ -25,6 +25,7 @@ final class SettingViewModel: ViewModelProtocol {
         let showAlertTrigger: Driver<Void>
         let withdrawComplete: Driver<Void>
         let moveToModifyPage: Driver<Bool>
+        let tableViewMenu: Driver<[String]>
     }
     
     func transform(input: Input) -> Output {
@@ -32,6 +33,8 @@ final class SettingViewModel: ViewModelProtocol {
         let profileInfo = PublishRelay<ProfileModel>()
         let withdrawComplete = PublishRelay<Void>()
         let moveToModifyPage = PublishRelay<Bool>()
+        let menuList = ["내가 만든 택시팟", "참가한 택시팟"]
+        let tableViewMenu = BehaviorSubject(value: menuList)
         
         input.fetchProfile
             .flatMap {
@@ -88,7 +91,8 @@ final class SettingViewModel: ViewModelProtocol {
             profileInfo: profileInfo.asDriver(onErrorJustReturn: errorModel),
             showAlertTrigger: input.withdrawButtonTapped.asDriver(onErrorJustReturn: ()),
             withdrawComplete: withdrawComplete.asDriver(onErrorJustReturn: ()),
-            moveToModifyPage: moveToModifyPage.asDriver(onErrorJustReturn: false))
+            moveToModifyPage: moveToModifyPage.asDriver(onErrorJustReturn: false),
+            tableViewMenu: tableViewMenu.asDriver(onErrorJustReturn: []))
     }
     
 }

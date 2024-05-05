@@ -1,23 +1,18 @@
 //
-//  NearMapView.swift
+//  PartyPostInfoView.swift
 //  TaxiParty
 //
-//  Created by Greed on 4/21/24.
+//  Created by Greed on 5/5/24.
 //
 
 import UIKit
-import NMapsMap
+import Kingfisher
 import SnapKit
 import Then
-import Kingfisher
 
-final class NearMapView: BaseView {
-    
-    var clusterer: NMCClusterer<ItemKey>?
-    var delegate: transferData?
-    
-    let mapView = BaseMapView()
-    let backView = UIView().then {
+final class PartyPostInfoView: BaseView {
+
+    private let backView = UIView().then {
         $0.layer.cornerRadius = 20
         $0.layer.borderWidth = 1
         $0.layer.borderColor = UIColor.grayBorder.cgColor
@@ -59,32 +54,22 @@ final class NearMapView: BaseView {
         $0.textColor = .lightGray
         $0.text = "도착지"
     }
-    private let dueDateLabel = UILabel().then {
+    let dueDateLabel = UILabel().then {
         $0.font = .Spoqa(size: 12, weight: .light)
         $0.text = "7시간 남음"
     }
-    private let leftNum = UILabel().then {
+    let leftNum = UILabel().then {
         $0.font = .Spoqa(size: 16, weight: .bold)
     }
     
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        backView.isHidden = true
-    }
-    
     override func setHierarchy() {
-        addSubViews(views: [mapView, backView])
+        addSubViews(views: [backView])
         backView.addSubViews(views: [creatorImage, creatorNick, title, startPointIcon, destinationIcon, interLineImage, interLineImage, startPointLabel, destinationLabel, startInfoLabel, destinationInfoLabel, dueDateLabel, leftNum])
     }
     
     override func setupLayout() {
-        mapView.snp.makeConstraints { make in
-            make.top.horizontalEdges.equalTo(self)
-            make.bottom.equalTo(self.safeAreaLayoutGuide)
-        }
         backView.snp.makeConstraints { make in
-            make.bottom.equalTo(self.safeAreaLayoutGuide).offset(-50)
-            make.centerX.equalTo(self)
+            make.center.equalTo(self)
             make.width.equalTo(300)
             make.height.equalTo(200)
         }
@@ -146,7 +131,6 @@ final class NearMapView: BaseView {
     }
     
     func configureInfoView(post: Post) {
-        delegate?.transferData(item: post)
         backView.isHidden = false
         title.text = post.title
         creatorImage.image = UIImage(systemName: "person")
@@ -167,105 +151,5 @@ final class NearMapView: BaseView {
             creatorImage.image = UIImage(named: "defaultProfile")
         }
     }
-    
-    func configureMap(items: [Post]) {
-        
-        let builder = NMCBuilder<ItemKey>()
-        let leafMarkerUpdater = LeafMarkerUpdater()
-        leafMarkerUpdater.postItems = items
-        leafMarkerUpdater.nearMapView = self
-        builder.minZoom = 3
-        builder.leafMarkerUpdater = leafMarkerUpdater
-        self.clusterer = builder.build()
-        leafMarkerUpdater.clusterer = self.clusterer
-        var keyTagMap: [ItemKey: NSNull] = [:]
-        var index = 0
-        
-        for post in items {
-            let startData = post.startPlaceData.split(separator: ",")
-            
-            index += 1
-            let newItem = ItemKey(identifier: index, position: NMGLatLng(lat: Double(startData[2]) ?? 37.654165, lng: Double(startData[1]) ?? 127.049696))
-            keyTagMap[newItem] = NSNull()
-        }
-        
-        clusterer?.addAll(keyTagMap)
-        clusterer?.mapView = self.mapView.naverMapView.mapView
-        
-    }
-    
-}
 
-extension NearMapView {
-    class ItemKey: NSObject, NMCClusteringKey {
-        let identifier: Int
-        let position: NMGLatLng
-        
-        init(identifier: Int, position: NMGLatLng) {
-            self.identifier = identifier
-            self.position = position
-        }
-        
-        static func markerKey(withIdentifier identifier: Int, position: NMGLatLng) -> ItemKey {
-            return ItemKey(identifier: identifier, position: position)
-        }
-        
-        override func isEqual(_ o: Any?) -> Bool {
-            guard let o = o as? ItemKey else {
-                return false
-            }
-            if self === o {
-                return true
-            }
-            
-            return o.identifier == self.identifier
-        }
-        
-        override var hash: Int {
-            return self.identifier
-        }
-        
-        func copy(with zone: NSZone? = nil) -> Any {
-            return ItemKey(identifier: self.identifier, position: self.position)
-        }
-    }
-    
-    class LeafMarkerUpdater: NMCDefaultLeafMarkerUpdater {
-        var clusterer: NMCClusterer<ItemKey>?
-        var postItems: [Post] = []
-        var nearMapView: NearMapView?
-        
-        override func updateLeafMarker(_ info: NMCLeafMarkerInfo, _ marker: NMFMarker) {
-            super.updateLeafMarker(info, marker)
-            if let key = info.key as? ItemKey {
-                marker.iconImage = NMFOverlayImage(image: (UIImage(systemName: "car.circle.fill") ?? UIImage(named: "destination")!))
-                marker.width = 24
-                marker.height = 24
-                marker.iconTintColor = .black
-                
-                if let postItem = postItems.first(where: { $0.startPlaceData.contains(String(key.position.lat)) }) {
-                    let destinationData = postItem.destinationData.split(separator: ",")
-                    let destination = destinationData[0].split(separator: " ")
-                    
-                    var captionText: String
-                    if destination.count >= 2 {
-                        captionText = destination[0] + " " + destination[1]
-                    } else {
-                        captionText = String(destination[0])
-                    }
-                    
-                    marker.captionText = captionText
-                }
-                
-                marker.touchHandler = { [weak self] (o: NMFOverlay) -> Bool in
-                    if let postItem = self?.postItems.first(where: { $0.startPlaceData.contains(String(key.position.lat)) }) {
-                        self?.nearMapView?.configureInfoView(post: postItem)
-                    }
-                    return true
-                }
-            }
-        }
-    }
-    
 }
-

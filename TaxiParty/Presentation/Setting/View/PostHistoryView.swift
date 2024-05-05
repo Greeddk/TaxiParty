@@ -1,14 +1,14 @@
 //
-//  SearchPostView.swift
+//  PostHistoryView.swift
 //  TaxiParty
 //
-//  Created by Greed on 4/21/24.
+//  Created by Greed on 5/5/24.
 //
 
 import UIKit
 import SnapKit
 
-final class SearchPostView: BaseView {
+final class PostHistoryView: BaseView {
 
     lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: configureCollectionViewLayout())
     
@@ -21,19 +21,17 @@ final class SearchPostView: BaseView {
     }
     
     override func setHierarchy() {
-        self.addSubview(collectionView)
+        addSubview(collectionView)
     }
     
     override func setupLayout() {
         collectionView.snp.makeConstraints { make in
-            make.top.horizontalEdges.equalTo(self.safeAreaLayoutGuide)
-            make.bottom.equalTo(self.safeAreaLayoutGuide).offset(-30)
+            make.edges.equalTo(self.safeAreaLayoutGuide)
         }
     }
-    
-    override func setupData() {
+    override func setupAttributes() {
         collectionView.register(PartyPostCollectionViewCell.self, forCellWithReuseIdentifier: PartyPostCollectionViewCell.identifier)
         collectionView.showsVerticalScrollIndicator = false
     }
-
+    
 }

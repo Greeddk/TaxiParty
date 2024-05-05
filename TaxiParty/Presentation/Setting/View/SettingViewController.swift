@@ -90,7 +90,20 @@ final class SettingViewController: BaseViewController, fetchNewData {
                 }
             }
             .disposed(by: disposeBag)
-
+        
+        output.tableViewMenu
+            .drive(mainView.tableView.rx.items(cellIdentifier: "Cell", cellType: UITableViewCell.self)) { row, element, cell in
+                cell.textLabel?.text = element
+                cell.accessoryType = .disclosureIndicator
+            }
+            .disposed(by: disposeBag)
+        
+        mainView.tableView.rx
+            .modelSelected(String.self)
+            .bind(with: self) { owner, _ in
+                owner.navigationController?.pushViewController(PostHistoryViewController(), animated: true)
+            }
+            .disposed(by: disposeBag)
         
     }
     

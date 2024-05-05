@@ -13,6 +13,7 @@ enum PostRouter {
     case writePost(query: PostQuery)
     case joinParty(postId: String, status: JoinPartyQuery)
     case getOnePost(postId: String)
+    case fetchMyPosts(next: String)
 }
 
 extension PostRouter: RouterType {
@@ -31,6 +32,8 @@ extension PostRouter: RouterType {
             return .post
         case .getOnePost:
             return .get
+        case .fetchMyPosts:
+            return .get
         }
     }
     
@@ -44,6 +47,8 @@ extension PostRouter: RouterType {
             return "/v1/posts/\(postId)/like"
         case .getOnePost(let postId):
             return "/v1/posts/\(postId)"
+        case .fetchMyPosts:
+            return "/v1/posts/users/\(TokenManager.userId)"
         }
     }
     
@@ -61,6 +66,9 @@ extension PostRouter: RouterType {
                     HTTPHeader.sesacKey.rawValue: APIKey.sesacKey.rawValue,
                     HTTPHeader.contentType.rawValue: HTTPHeader.json.rawValue]
         case .getOnePost:
+            return [HTTPHeader.authorization.rawValue: TokenManager.accessToken,
+                    HTTPHeader.sesacKey.rawValue: APIKey.sesacKey.rawValue]
+        case .fetchMyPosts:
             return [HTTPHeader.authorization.rawValue: TokenManager.accessToken,
                     HTTPHeader.sesacKey.rawValue: APIKey.sesacKey.rawValue]
         }
@@ -85,6 +93,13 @@ extension PostRouter: RouterType {
             return nil
         case .getOnePost:
             return nil
+        case .fetchMyPosts(let next):
+            let queryItem = [
+                URLQueryItem(name: "product_id", value: ProductId.taxiParty.rawValue),
+                URLQueryItem(name: "limit", value: "10"),
+                URLQueryItem(name: "next", value: next)
+            ]
+            return queryItem
         }
     }
     
@@ -99,6 +114,8 @@ extension PostRouter: RouterType {
             let encoder = JSONEncoder()
             return try? encoder.encode(status)
         case .getOnePost:
+            return nil
+        case .fetchMyPosts:
             return nil
         }
     }

@@ -55,7 +55,6 @@ final class LogInViewModel: ViewModelProtocol {
                     indicatorTrigger.accept(false)
                     loginSuccessTrigger.accept(true)
                 case .failure(let error):
-                    // TODO: 로그인 실패 라벨로 보내기
                     print(error)
                     indicatorTrigger.accept(false)
                     loginSuccessTrigger.accept(false)

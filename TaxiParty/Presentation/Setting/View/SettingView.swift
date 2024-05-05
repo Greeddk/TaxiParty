@@ -49,9 +49,22 @@ final class SettingView: BaseView {
         $0.setTitleColor(.pointPurple, for: .normal)
         $0.titleLabel?.font = .Spoqa(size: 16, weight: .regular)
     }
+    let tableView = UITableView(frame: .zero, style: .insetGrouped).then {
+        $0.layer.shadowColor = UIColor.black.cgColor
+        $0.layer.shadowOpacity = 0.2
+        $0.layer.shadowRadius = 7
+        $0.layer.shadowOffset = CGSize(width: 0, height: 3)
+        $0.bounces = false
+        $0.isScrollEnabled = false
+    }
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        
+    }
     
     override func setHierarchy() {
-        self.addSubViews(views: [backView, profileImageView, nicknameLabel, emailLabel, phoneIcon, phoneLabel, editButton, withdrawButton])
+        self.addSubViews(views: [backView, profileImageView, nicknameLabel, emailLabel, phoneIcon, phoneLabel, editButton, withdrawButton, tableView])
     }
     
     override func setupLayout() {
@@ -90,6 +103,11 @@ final class SettingView: BaseView {
             make.bottom.equalTo(self.safeAreaLayoutGuide).offset(-60)
             make.centerX.equalTo(self)
         }
+        tableView.snp.makeConstraints { make in
+            make.top.equalTo(backView.snp.bottom).offset(30)
+            make.horizontalEdges.equalTo(self)
+            make.bottom.equalTo(withdrawButton.snp.top).offset(-10)
+        }
     }
     
     func configureView(profile: ProfileModel) {
@@ -105,4 +123,10 @@ final class SettingView: BaseView {
             profileImageView.image = UIImage(named: "defaultProfile")
         }
     }
+    
+    override func setupAttributes() {
+        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "Cell")
+        tableView.backgroundColor = .white
+    }
+    
 }
