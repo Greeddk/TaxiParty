@@ -18,6 +18,9 @@ final class LogInView: BaseView {
         $0.backgroundColor = .black.withAlphaComponent(0.2)
     }
     
+    let mainImageView = UIImageView().then {
+        $0.image = UIImage(named: "mainImage")
+    }
     let emailTextField = PointBorderTextField().then {
         $0.placeholder = "이메일을 입력해주세요"
         $0.keyboardType = .emailAddress
@@ -36,12 +39,17 @@ final class LogInView: BaseView {
     }
     
     override func setHierarchy() {
-        addSubViews(views: [emailTextField, passwordTextField, logInButton, signUpButton])
+        addSubViews(views: [mainImageView, emailTextField, passwordTextField, logInButton, signUpButton])
     }
     
     override func setupLayout() {
+        mainImageView.snp.makeConstraints { make in
+            make.top.equalTo(self).offset(50)
+            make.horizontalEdges.equalTo(self)
+            make.height.equalTo(190)
+        }
         emailTextField.snp.makeConstraints { make in
-            make.top.equalTo(self.safeAreaLayoutGuide).offset(100)
+            make.top.equalTo(mainImageView.snp.bottom).offset(10)
             make.horizontalEdges.equalTo(self.safeAreaLayoutGuide).inset(30)
             make.height.equalTo(60)
         }
