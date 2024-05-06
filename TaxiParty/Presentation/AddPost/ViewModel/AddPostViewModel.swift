@@ -53,7 +53,7 @@ final class AddPostViewModel: ViewModelProtocol {
                             newAddress = newValue.region.area3.name + " " + newValue.land.addition0.value
                         }
                         address = newAddress
-                    } else {
+                    } else if success.results.count == 1 {
                         let oldValue = success.results[0]
                         let oldAddress = oldValue.region.area1.alias + " " + oldValue.region.area2.name + " "  + oldValue.region.area3.name  + " "  + oldValue.land.number1 + "-" + oldValue.land.number2
                         address = oldAddress

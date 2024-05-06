@@ -14,6 +14,7 @@ enum PostRouter {
     case joinParty(postId: String, status: JoinPartyQuery)
     case getOnePost(postId: String)
     case fetchMyPosts(next: String)
+    case fetchJoinPosts(next: String)
 }
 
 extension PostRouter: RouterType {
@@ -34,6 +35,8 @@ extension PostRouter: RouterType {
             return .get
         case .fetchMyPosts:
             return .get
+        case .fetchJoinPosts:
+            return .get
         }
     }
     
@@ -49,6 +52,8 @@ extension PostRouter: RouterType {
             return "/v1/posts/\(postId)"
         case .fetchMyPosts:
             return "/v1/posts/users/\(TokenManager.userId)"
+        case .fetchJoinPosts:
+            return "/v1/posts/likes/me"
         }
     }
     
@@ -69,6 +74,9 @@ extension PostRouter: RouterType {
             return [HTTPHeader.authorization.rawValue: TokenManager.accessToken,
                     HTTPHeader.sesacKey.rawValue: APIKey.sesacKey.rawValue]
         case .fetchMyPosts:
+            return [HTTPHeader.authorization.rawValue: TokenManager.accessToken,
+                    HTTPHeader.sesacKey.rawValue: APIKey.sesacKey.rawValue]
+        case .fetchJoinPosts:
             return [HTTPHeader.authorization.rawValue: TokenManager.accessToken,
                     HTTPHeader.sesacKey.rawValue: APIKey.sesacKey.rawValue]
         }
@@ -100,6 +108,12 @@ extension PostRouter: RouterType {
                 URLQueryItem(name: "next", value: next)
             ]
             return queryItem
+        case .fetchJoinPosts(let next):
+            let queryItem = [
+                URLQueryItem(name: "limit", value: "10"),
+                URLQueryItem(name: "next", value: next)
+            ]
+            return queryItem
         }
     }
     
@@ -116,6 +130,8 @@ extension PostRouter: RouterType {
         case .getOnePost:
             return nil
         case .fetchMyPosts:
+            return nil
+        case .fetchJoinPosts:
             return nil
         }
     }

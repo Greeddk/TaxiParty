@@ -21,7 +21,9 @@ final class PartyPostCollectionViewCell: BaseCollectionViewCell {
         $0.layer.shadowRadius = 7
         $0.layer.shadowOffset = CGSize(width: 0, height: 3)
     }
-    let creatorImage = RoundImageView(frame: .zero)
+    let creatorImage = RoundImageView(frame: .zero).then {
+        $0.contentMode = .scaleAspectFill
+    }
     let creatorNick = UILabel().then {
         $0.font = .Spoqa(size: 12, weight: .medium)
     }

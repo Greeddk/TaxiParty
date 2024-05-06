@@ -99,9 +99,14 @@ final class SettingViewController: BaseViewController, fetchNewData {
             .disposed(by: disposeBag)
         
         mainView.tableView.rx
-            .modelSelected(String.self)
-            .bind(with: self) { owner, _ in
-                owner.navigationController?.pushViewController(PostHistoryViewController(), animated: true)
+            .itemSelected
+            .bind(with: self) { owner, indexPath in
+                owner.mainView.tableView.deselectRow(at: indexPath, animated: true)
+                if indexPath.row == 0 {
+                    owner.navigationController?.pushViewController(PostHistoryViewController(), animated: true)
+                } else {
+                    owner.navigationController?.pushViewController(JoinPartyListViewController(), animated: true)
+                }
             }
             .disposed(by: disposeBag)
         

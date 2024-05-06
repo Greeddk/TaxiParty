@@ -108,7 +108,7 @@ final class NetworkManager {
             return Disposables.create()
         }
     }
-    
+
     func callGeocodingRequest<T>(type: T.Type, router: RouterType) -> Single<Result<T, NetworkError>> where T: Decodable {
         return Single.create { single -> Disposable in
             

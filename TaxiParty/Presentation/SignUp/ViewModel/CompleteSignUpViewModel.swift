@@ -26,7 +26,7 @@ final class CompleteSignUpViewModel {
         let backToRootViewTrigger = PublishRelay<Void>()
         
         input.startTimerTrigger
-            .delay(.seconds(5), scheduler: MainScheduler.instance)
+            .delay(.seconds(3), scheduler: MainScheduler.instance)
             .bind(onNext: {
                 backToRootViewTrigger.accept(())
             })

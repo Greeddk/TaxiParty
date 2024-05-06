@@ -174,7 +174,7 @@ final class NearMapView: BaseView {
         let leafMarkerUpdater = LeafMarkerUpdater()
         leafMarkerUpdater.postItems = items
         leafMarkerUpdater.nearMapView = self
-        builder.minZoom = 3
+        builder.minZoom = 4
         builder.leafMarkerUpdater = leafMarkerUpdater
         self.clusterer = builder.build()
         leafMarkerUpdater.clusterer = self.clusterer

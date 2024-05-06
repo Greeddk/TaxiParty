@@ -41,7 +41,7 @@ final class CompleteSignUpView: BaseView {
 
     override func setupAttributes() {
         completeLabel.text = "회원가입이 \n 완료되었습니다!"
-        infoLabel.text = "5초 뒤 자동으로 로그인 화면으로 이동합니다!"
+        infoLabel.text = "3초 뒤 자동으로 로그인 화면으로 이동합니다!"
     }
     
 }
