@@ -10,6 +10,12 @@ import SnapKit
 
 final class SearchPostView: BaseView {
 
+    let title = UILabel().then {
+        $0.text = "택시팟"
+        $0.font = .Spoqa(size: 16, weight: .bold)
+        $0.textColor = .pointPurple
+        $0.textAlignment = .center
+    }
     lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: configureCollectionViewLayout())
     
     private func configureCollectionViewLayout() -> UICollectionViewLayout {
@@ -21,12 +27,19 @@ final class SearchPostView: BaseView {
     }
     
     override func setHierarchy() {
-        self.addSubview(collectionView)
+        addSubViews(views: [title, collectionView])
     }
     
     override func setupLayout() {
+        title.snp.makeConstraints { make in
+            make.top.equalTo(self.safeAreaLayoutGuide)
+            make.horizontalEdges.equalTo(self.safeAreaLayoutGuide)
+            make.centerY.equalTo(self)
+            make.height.equalTo(30)
+        }
         collectionView.snp.makeConstraints { make in
-            make.top.horizontalEdges.equalTo(self.safeAreaLayoutGuide)
+            make.top.equalTo(title.snp.bottom)
+            make.horizontalEdges.equalTo(self.safeAreaLayoutGuide)
             make.bottom.equalTo(self.safeAreaLayoutGuide).offset(-30)
         }
     }

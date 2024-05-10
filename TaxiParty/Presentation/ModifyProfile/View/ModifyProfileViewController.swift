@@ -30,7 +30,7 @@ final class ModifyProfileViewController: BaseViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         hideKeyboardWhenViewIsTapped()
-        setNavigationBackButton()
+        setNavigationBackButton(title: "프로필 변경")
         fetchDataTrigger.accept(())
     }
     

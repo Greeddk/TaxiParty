@@ -22,8 +22,7 @@ final class FillPostViewController: BaseViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationController?.isNavigationBarHidden = false
-        setNavigationBackButton()
-        navigationItem.title = "파티 만들기"
+        setNavigationBackButton(title: "파티 만들기")
         fetchDataTrigger.accept(())
     }
     

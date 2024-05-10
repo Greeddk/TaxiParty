@@ -21,7 +21,7 @@ final class JoinPartyListViewController: BaseViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        setNavigationBackButton()
+        setNavigationBackButton(title: "참여한 택시팟")
         fetchDataTrigger.accept(())
     }
     

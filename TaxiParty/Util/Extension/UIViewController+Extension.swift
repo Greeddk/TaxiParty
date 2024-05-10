@@ -19,7 +19,7 @@ extension UIViewController {
         view.endEditing(true)
     }
     
-    func setNavigationBackButton() {
+    func setNavigationBackButton(title: String) {
         navigationController?.isNavigationBarHidden = false
         hideBackButton()
         let imageConfig = UIImage.SymbolConfiguration(pointSize: 19, weight: .regular)
@@ -27,6 +27,7 @@ extension UIViewController {
         let backButton = UIBarButtonItem(image: image, style: .plain, target: self, action: #selector(backButtonClicked))
         backButton.tintColor = .pointPurple
         navigationItem.leftBarButtonItem = backButton
+        navigationItem.title = title
     }
     
     func hideBackButton() {

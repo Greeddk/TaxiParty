@@ -21,7 +21,7 @@ final class PostHistoryViewController: BaseViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        setNavigationBackButton()
+        setNavigationBackButton(title: "내가 만든 택시팟")
         fetchDataTrigger.accept(())
     }
     

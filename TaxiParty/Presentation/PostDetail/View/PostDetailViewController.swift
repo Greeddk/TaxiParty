@@ -26,7 +26,7 @@ final class PostDetailViewController: BaseViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        setNavigationBackButton()
+        setNavigationBackButton(title: "")
         viewDidLoadTrigger.accept(())
     }
 
