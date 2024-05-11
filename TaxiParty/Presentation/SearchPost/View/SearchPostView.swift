@@ -34,7 +34,6 @@ final class SearchPostView: BaseView {
         title.snp.makeConstraints { make in
             make.top.equalTo(self.safeAreaLayoutGuide)
             make.horizontalEdges.equalTo(self.safeAreaLayoutGuide)
-            make.centerY.equalTo(self)
             make.height.equalTo(30)
         }
         collectionView.snp.makeConstraints { make in
