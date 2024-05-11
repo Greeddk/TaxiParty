@@ -3,11 +3,11 @@
 # 프로젝트 소개
 
 # 스크린샷
-<img width="24%" src="https://github.com/Greeddk/UQuiz/assets/116425551/b919d2e1-aa94-417c-9d3c-cef0c04a82b0"/>
-<img width="24%" src="https://github.com/Greeddk/UQuiz/assets/116425551/2a971b72-8708-4bad-979f-5c78e5eb8aef"/>
-<img width="24%" src="https://github.com/Greeddk/UQuiz/assets/116425551/1c4f1acd-abb9-4a5c-bfdb-0a99c24d887d"/>
-<img width="24%" src="https://github.com/Greeddk/UQuiz/assets/116425551/dd4c5dcd-397c-490a-93dd-00de23261ece"/>
-
+<img width="19%" src="https://github.com/Greeddk/TaxiParty/assets/116425551/114f2842-d2ed-4d0a-a455-ffd52efaca5c"/>
+<img width="19%" src="https://github.com/Greeddk/TaxiParty/assets/116425551/7d210683-364c-4399-b9be-f3f7bd735529"/>
+<img width="19%" src="https://github.com/Greeddk/TaxiParty/assets/116425551/b6e31bd4-f33f-4f9e-b8b1-0fadd518f845"/>
+<img width="19%" src="https://github.com/Greeddk/TaxiParty/assets/116425551/c7db8d84-7c65-4bf8-86c1-63569cb70c4b"/>
+<img width="19%" src="https://github.com/Greeddk/TaxiParty/assets/116425551/20d4d87e-e428-499d-92ff-3e0199f9955e"/>
 
 # 앱 소개 & 기획
 ## ‎‎택시팟 - 택시 합승 플랫폼
