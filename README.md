@@ -63,7 +63,7 @@
  <img width="30%" src="https://github.com/Greeddk/TaxiParty/assets/116425551/c7a76f2b-1d0f-4a3d-b5df-a182c4a8ac05"/>
  <img width="30%" src="https://github.com/Greeddk/TaxiParty/assets/116425551/26fddf5c-4f81-4ac6-98cc-d70392484014"/>
 
-  어느 택시 앱과 같은 바텀시트뷰를 만들기 위해 택스트 필드를 누르면 전체화면으로 뒤로가기 버튼을 누르면 최소 크기로 바뀌게 만들려고 한다. 이를 구현하기 위해 라이브러리를 쓰지 않고 Custom Bottom View를 만들어 버튼과 택스트필드에 타겟을 추가하여 해결했다.
+  어느 택시 앱과 같은 바텀시트뷰를 만들기 위해 택스트 필드를 누르면 전체화면으로 뒤로가기 버튼을 누르면 최소 크기로 바뀌게 만들고 싶었다. 기존 라이브러리로는 이와 같은 구현이 힘들어 라이브러리를 쓰지 않고 Custom Bottom Sheet View를 만들었고, 버튼과 택스트필드에 타겟을 추가하여 각 각 클릭되었을 때 크기가 바뀌게 설정하여 해결했다.
  
 <details>
 <summary>코드 보기</summary>
