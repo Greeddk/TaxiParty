@@ -55,8 +55,8 @@ final class SignUpViewModel: ViewModelProtocol {
         Observable.merge(input.phoneNumTextReturned, input.nextButtonTapped)
             .withLatestFrom(SignUpObservable)
             .flatMap { join in
-                return NetworkManager.shared.callRequest(type: SignUpModel.self, router: APIRouter.authenticationRouter(.join(query: JoinQuery(email: join.email, password: join.password, nick: join.nick, phoneNum: join.phoneNum))).convertToURLRequest())
-            }.debug()
+                return NetworkManager.shared.callRequest(type: SignUpModel.self, router: .authenticationRouter(.join(query: JoinQuery(email: join.email, password: join.password, nick: join.nick, phoneNum: join.phoneNum))))
+            }
             .bind(with: self) { owner, value in
                 switch value {
                 case .success(let success):
@@ -83,8 +83,7 @@ final class SignUpViewModel: ViewModelProtocol {
                 descriptionText.accept("이메일 중복 체크 중이에요")
                 return self.networkManager.callRequest(
                     type: ValidationEmailModel.self,
-                    router: APIRouter.authenticationRouter(.validationEmail(query: ValidationEmail(email: email)))
-                        .convertToURLRequest()
+                    router: .authenticationRouter(.validationEmail(query: ValidationEmail(email: email)))
                 )
             }
             .bind(with: self) { owner, value in
@@ -102,7 +101,6 @@ final class SignUpViewModel: ViewModelProtocol {
             }
             .disposed(by: disposeBag)
 
-        
         input.passwordTextReturned
             .withLatestFrom(input.passwordText)
             .bind(with: self) { owner, password in

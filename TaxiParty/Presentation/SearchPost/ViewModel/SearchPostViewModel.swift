@@ -30,7 +30,7 @@ final class SearchPostViewModel: ViewModelProtocol {
         
         input.fetchDataTrigger
             .flatMap {
-                return NetworkManager.shared.callRequest(type: FetchPostModel.self, router: APIRouter.postRouter(.fetchPost(next: "", limit: 10)).convertToURLRequest())
+                return NetworkManager.shared.callRequest(type: FetchPostModel.self, router: .postRouter(.fetchPost(next: "", limit: 10)))
             }
             .bind(with: self) { owner, response in
                 switch response {
@@ -48,7 +48,7 @@ final class SearchPostViewModel: ViewModelProtocol {
             .withLatestFrom(nextCursor)
             .filter { $0 != "0" }
             .flatMapLatest { nextCursor in
-                return NetworkManager.shared.callRequest(type: FetchPostModel.self, router: APIRouter.postRouter(.fetchPost(next: nextCursor, limit: 10)).convertToURLRequest())
+                return NetworkManager.shared.callRequest(type: FetchPostModel.self, router: .postRouter(.fetchPost(next: nextCursor, limit: 10)))
             }
             .bind(with: self) { owner, response in
                 switch response {

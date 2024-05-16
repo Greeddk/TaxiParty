@@ -98,7 +98,7 @@ final class PostDetailViewModel: ViewModelProtocol {
             .flatMap {
                 let status = self.postItem.together.contains(TokenManager.userId)
                 print(status)
-                return NetworkManager.shared.callRequest(type: JoinPartyModel.self, router: APIRouter.postRouter(.joinParty(postId: self.postItem.postId, status: JoinPartyQuery(likeStatus: !status))).convertToURLRequest())
+                return NetworkManager.shared.callRequest(type: JoinPartyModel.self, router: .postRouter(.joinParty(postId: self.postItem.postId, status: JoinPartyQuery(likeStatus: !status))))
             }
             .bind(with: self) { owner, response in
                 switch response {
@@ -113,7 +113,7 @@ final class PostDetailViewModel: ViewModelProtocol {
         
         refreshPostTrigger.asObservable()
             .flatMap {
-                return NetworkManager.shared.callRequest(type: Post.self, router: APIRouter.postRouter(.getOnePost(postId: self.postItem.postId)).convertToURLRequest())
+                return NetworkManager.shared.callRequest(type: Post.self, router: .postRouter(.getOnePost(postId: self.postItem.postId)))
             }
             .bind(with: self) { owner, response in
                 switch response {

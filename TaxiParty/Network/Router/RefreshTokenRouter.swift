@@ -8,11 +8,11 @@
 import Foundation
 import Alamofire
 
-enum refreshTokenRouter {
+enum RefreshTokenRouter {
     case refreshToken
 }
 
-extension refreshTokenRouter: RouterType {
+extension RefreshTokenRouter: RouterType {
 
     var baseURL: String {
         return APIKey.baseURL.rawValue

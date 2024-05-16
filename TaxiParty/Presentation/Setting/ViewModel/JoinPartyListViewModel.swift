@@ -30,7 +30,7 @@ final class JoinPartyListViewModel {
         
         input.fetchDataTrigger
             .flatMap {
-                return NetworkManager.shared.callRequest(type: FetchPostModel.self, router: APIRouter.postRouter(.fetchJoinPosts(next: "")).convertToURLRequest())
+                return NetworkManager.shared.callRequest(type: FetchPostModel.self, router: .postRouter(.fetchJoinPosts(next: "")))
             }
             .bind(with: self) { owner, response in
                 switch response {
@@ -48,7 +48,7 @@ final class JoinPartyListViewModel {
             .withLatestFrom(nextCursor)
             .filter { $0 != "0" }
             .flatMapLatest { nextCursor in
-                return NetworkManager.shared.callRequest(type: FetchPostModel.self, router: APIRouter.postRouter(.fetchJoinPosts(next: nextCursor)).convertToURLRequest())
+                return NetworkManager.shared.callRequest(type: FetchPostModel.self, router: .postRouter(.fetchJoinPosts(next: nextCursor)))
             }
             .bind(with: self) { owner, response in
                 switch response {

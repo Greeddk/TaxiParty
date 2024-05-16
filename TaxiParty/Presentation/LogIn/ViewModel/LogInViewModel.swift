@@ -43,7 +43,7 @@ final class LogInViewModel: ViewModelProtocol {
             .withLatestFrom(logInObservable)
             .flatMapLatest { logInQuery in
                 indicatorTrigger.accept(true)
-                return NetworkManager.shared.callRequest(type: LoginModel.self, router: APIRouter.authenticationRouter(.login(query: logInQuery)).convertToURLRequest())
+                return NetworkManager.shared.callRequest(type: LoginModel.self, router: .authenticationRouter(.login(query: logInQuery)))
             }
             .bind { response in
                 switch response {

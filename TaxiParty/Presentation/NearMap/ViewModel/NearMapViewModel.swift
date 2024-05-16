@@ -32,7 +32,7 @@ final class NearMapViewModel {
         
         input.fetchDataTrigger
             .flatMap {
-                return NetworkManager.shared.callRequest(type: FetchPostModel.self, router: APIRouter.postRouter(.fetchPost(next: "", limit: 500)).convertToURLRequest())
+                return NetworkManager.shared.callRequest(type: FetchPostModel.self, router: .postRouter(.fetchPost(next: "", limit: 500)))
             }
             .bind(with: self) { owner, response in
                 switch response {

@@ -9,7 +9,7 @@ import Foundation
 
 enum APIRouter {
     case authenticationRouter(AuthenticationRouter)
-    case refreshTokenRouter(refreshTokenRouter)
+    case refreshTokenRouter(RefreshTokenRouter)
     case postRouter(PostRouter)
     case profileRouter(ProfileRouter)
     case geocodingRouter(GeocodingRouter)

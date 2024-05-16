@@ -38,7 +38,7 @@ final class SettingViewModel: ViewModelProtocol {
         
         input.fetchProfile
             .flatMap {
-                return NetworkManager.shared.callRequest(type: ProfileModel.self, router: APIRouter.profileRouter(.fetchProfile).convertToURLRequest())
+                return NetworkManager.shared.callRequest(type: ProfileModel.self, router: .profileRouter(.fetchProfile))
             }
             .bind(with: self) { owner, response in
                 switch response {
@@ -59,7 +59,7 @@ final class SettingViewModel: ViewModelProtocol {
         
         input.withdrawTrigger
             .flatMap {
-                return NetworkManager.shared.callRequest(type: WithdrawModel.self, router: APIRouter.authenticationRouter(.withdraw).convertToURLRequest())
+                return NetworkManager.shared.callRequest(type: WithdrawModel.self, router: .authenticationRouter(.withdraw))
             }
             .bind(with: self) { owner, response in
                 switch response {

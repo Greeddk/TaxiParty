@@ -84,7 +84,7 @@ struct tabSwiftUIView: View {
         }
     }
     
-    func tabbars() -> some View {
+    private func tabbars() -> some View {
         NavigationStack {
             ZStack(alignment: .bottom) {
                 TabViews.allCases[selectedIndex].asViewController
