@@ -9,8 +9,7 @@
 <img width="19%" src="https://github.com/Greeddk/TaxiParty/assets/116425551/c7db8d84-7c65-4bf8-86c1-63569cb70c4b"/>
 <img width="19%" src="https://github.com/Greeddk/TaxiParty/assets/116425551/20d4d87e-e428-499d-92ff-3e0199f9955e"/>
 
-# 앱 소개 & 기획
-## ‎‎택시팟 - 택시 합승 플랫폼
+# ‎‎택시팟 - 택시 합승 플랫폼
 
 ## 개발 기간과 v1.0 버전 기능
 ### 개발 기간
