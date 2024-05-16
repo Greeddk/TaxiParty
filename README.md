@@ -55,6 +55,176 @@
 <br>
 <br>
 
+# 구현 고려 사항
+
+### 1. Router들을 하나의 Enum으로 관리
+
+- 다양한 API의 EndPoint 유지보수와 가독성 측면을 고려해 Router를 관심사에 따라 분리
+- 코드를 사용할 때 실수를 방지하기 위해 열거형으로 관리
+- 편리하게 코드 작성 가능
+
+<details>
+<summary>코드 보기</summary>
+ 
+```swift
+enum APIRouter {
+    case authenticationRouter(AuthenticationRouter)
+    case refreshTokenRouter(RefreshTokenRouter)
+    case postRouter(PostRouter)
+    case profileRouter(ProfileRouter)
+    case geocodingRouter(GeocodingRouter)
+    
+    func convertToURLRequest() -> RouterType {
+        switch self {
+        case .authenticationRouter(let authenticationRouter):
+            return authenticationRouter
+        case .refreshTokenRouter(let refreshTokenRouter):
+            return refreshTokenRouter
+        case .postRouter(let postRouter):
+            return postRouter
+        case .profileRouter(let profileRouter):
+            return profileRouter
+        case .geocodingRouter(let geocodingRouter):
+            return geocodingRouter
+        }
+    }
+}
+
+//사용시
+networkManager.callRequest(type: ValidationEmailModel.self, router: .authenticationRouter(.validationEmail(query: ValidationEmail(email: email)))
+```
+</details>
+
+### 2. Property Wrapper로 UserInfo 관리
+
+- 보일러 플레이트 코드 제거
+- 코드 재사용성 향상
+
+<details>
+<summary>코드 보기</summary>
+
+```swift
+@propertyWrapper
+struct TokenDefaults<T> {
+    let key: String
+    let defaultValue: T
+    
+    var wrappedValue: T {
+        get {
+            UserDefaults.standard.object(forKey: key) as? T ?? defaultValue
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: key)
+        }
+    }
+    
+}
+
+enum TokenManager {
+    enum Key: String {
+        case userId
+        case accessToken
+        case refreshToken
+    }
+    
+    @TokenDefaults(key: Key.userId.rawValue, defaultValue: "id 없음")
+    static var userId
+    
+    @TokenDefaults(key: Key.accessToken.rawValue, defaultValue: "액세스 토큰 없음")
+    static var accessToken
+    
+    @TokenDefaults(key: Key.refreshToken.rawValue, defaultValue: "리프레시 토큰 없음")
+    static var refreshToken
+    
+}
+```
+</details>
+
+### 3. RxSwift
+
+- 실시간으로 상호작용하는 반응형 프로그래밍을 쉽게 적용하기 위해 RxSwift를 적용
+- 서버와 통신을 비동기로 처리하고 Driver나 MainScheduler로 편하게 스레드를 관리가 용이하기 때문에 적용
+
+### 4. NaverMap
+
+- 네이버에서 Direction(네비게이션) API를 제공하고 있으며, Map API를 제공하는 회사별로 서로 다른 좌표계를 제공하기 때문에 추가적인 작업이 필요없는 네이버맵을 사용하기로 결정
+- 뷰의 재활용을 위해 커스텀 뷰로 구현
+
+### 5. MVVM Input - Output
+
+- Input - Output 패턴을 사용해 일정한 형태를 가진 MVVM 디자인 패턴을 적용
+- 데이터 흐름을 파악하고 상황에 맞는 Operator를 적용
+
+<details>
+<summary>코드 보기</summary>
+
+```swift
+protocol ViewModelProtocol {
+    associatedtype Input
+    associatedtype Output
+    
+    var disposeBag: DisposeBag { get set }
+    
+    func transform(input: Input) -> Output
+}
+```
+</details>
+
+### 6. Interceptor로 AccessToken 갱신
+
+- 사용자의 경험을 고려하여 AccessToken 만료 시 갱신되는 기능 구현
+<details>
+<summary>코드 보기</summary>
+
+```swift
+final class AuthInterceptor: RequestInterceptor {
+
+    func adapt(_ urlRequest: URLRequest, for session: Session, completion: @escaping (Result<URLRequest, any Error>) -> Void) {
+        let accessToken = TokenManager.accessToken
+        if accessToken == urlRequest.headers.dictionary[HTTPHeader.authorization.rawValue] {
+            completion(.success(urlRequest))
+        } else {
+            var urlRequest = urlRequest
+            urlRequest.setValue(TokenManager.accessToken, forHTTPHeaderField: HTTPHeader.authorization.rawValue)
+            
+            print("새 accessToken 적용 \(urlRequest.headers)")
+            completion(.success(urlRequest))
+        }
+        
+    }
+    
+    func retry(_ request: Request, for session: Session, dueTo error: any Error, completion: @escaping (RetryResult) -> Void) {
+        guard let response = request.task?.response as? HTTPURLResponse, response.statusCode == 419 else {
+            completion(.doNotRetryWithError(error))
+            return
+        }
+        
+        do {
+            let urlRequest = try RefreshTokenRouter.refreshToken.asURLRequest()
+            AF.request(urlRequest)
+                .validate(statusCode: 200..<300)
+                .responseDecodable(of: RefreshTokenModel.self) { response in
+                    switch response.result {
+                    case .success(let success):
+                        TokenManager.accessToken = success.accessToken
+                        completion(.retry)
+                    case .failure(let error):
+                        print(error)
+                        completion(.doNotRetryWithError(NetworkError.expireRefreshToken))
+                    }
+                }
+        } catch {
+            print(error)
+        }
+    }
+    
+}
+
+```
+</details>
+
+<br>
+
 # ⚒️트러블 슈팅
  처음 RxSwift를 적용한 프로젝트이면서 백앤드 서버를 제대로 써본 프로젝트이다. 아래는 그 문제들 중 어려웠던 문제들과 해결했던 방법을 설명해보려고 한다.
 
@@ -69,7 +239,7 @@
 <summary>코드 보기</summary>
   
 
-```
+```swift
 final class BottomSheetView: PassThroughView {
     
     enum Mode {
@@ -193,7 +363,7 @@ final class BottomSheetView: PassThroughView {
 <summary>코드 보기</summary>
   
 
-```
+```swift
    // bottomSheetView
     lazy var mode: Mode = .tip {
         didSet {
