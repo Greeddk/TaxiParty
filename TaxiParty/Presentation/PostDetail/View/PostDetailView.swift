@@ -197,10 +197,4 @@ final class PostDetailView: BaseView {
         formatAsDecimal(item.route.trafast[0].summary.taxiFare / (Int(currentNum) ?? 4)) + "원"
     }
     
-    private func formatAsDecimal(_ num: Int) -> String {
-        let numberFormmater = NumberFormatter()
-        numberFormmater.numberStyle = .decimal
-        return numberFormmater.string(from: NSNumber(value: num)) ?? "0"
-    }
-    
 }

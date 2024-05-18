@@ -30,4 +30,10 @@ class BaseView: UIView {
     
     func setupAttributes() { }
     
+    func formatAsDecimal(_ num: Int) -> String {
+        let numberFormmater = NumberFormatter()
+        numberFormmater.numberStyle = .decimal
+        return numberFormmater.string(from: NSNumber(value: num)) ?? "0"
+    }
+    
 }

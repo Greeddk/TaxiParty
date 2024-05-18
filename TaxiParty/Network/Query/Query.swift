@@ -49,3 +49,11 @@ struct JoinPartyQuery: HTTPBodyProtocol {
         case likeStatus = "like_status"
     }
 }
+
+struct CreateChatQuery: HTTPBodyProtocol {
+    let opponentId: String
+    
+    enum CodingKeys: String, CodingKey {
+        case opponentId = "opponent_id"
+    }
+}

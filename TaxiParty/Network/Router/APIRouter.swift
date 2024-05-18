@@ -13,6 +13,7 @@ enum APIRouter {
     case postRouter(PostRouter)
     case profileRouter(ProfileRouter)
     case geocodingRouter(GeocodingRouter)
+    case chattingRouter(ChattingRouter)
     
     func convertToURLRequest() -> RouterType {
         switch self {
@@ -26,6 +27,8 @@ enum APIRouter {
             return profileRouter
         case .geocodingRouter(let geocodingRouter):
             return geocodingRouter
+        case .chattingRouter(let chattingRouter):
+            return chattingRouter
         }
     }
 }
