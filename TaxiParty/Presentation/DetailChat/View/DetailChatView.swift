@@ -19,6 +19,7 @@ final class DetailChatView: BaseView {
         $0.layer.cornerRadius = 8
         $0.layer.borderColor = UIColor.pointPurple.cgColor
         $0.layer.borderWidth = 1
+        $0.addLeftPadding()
     }
     let sendButton = UIButton().then {
         $0.setImage(UIImage(systemName: "paperplane"), for: .normal)
@@ -34,16 +35,20 @@ final class DetailChatView: BaseView {
             make.bottom.equalTo(textField.snp.top)
         }
         textField.snp.makeConstraints { make in
-            make.leading.equalTo(self).offset(10)
-            make.trailing.equalTo(sendButton.snp.leading)
+            make.leading.equalTo(self).offset(20)
+            make.trailing.equalTo(sendButton.snp.leading).offset(-10)
             make.bottom.equalTo(keyboardLayoutGuide.snp.top).offset(-4)
             make.height.equalTo(40)
         }
         sendButton.snp.makeConstraints { make in
-            make.trailing.equalTo(self).offset(-10)
+            make.trailing.equalTo(self).offset(-20)
             make.centerY.equalTo(textField)
             make.size.equalTo(32)
         }
+    }
+    
+    override func setupAttributes() {
+        tableView.separatorStyle = .none
     }
 
 }

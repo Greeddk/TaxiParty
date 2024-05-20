@@ -11,10 +11,12 @@ import SnapKit
 
 final class MyChatTableViewCell: BaseTableViewCell {
 
-    let text = UILabel().then {
-        $0.backgroundColor = .pointPurple
+    let text = PaddingLabel().then {
+        $0.backgroundColor = .tabbar
+        $0.clipsToBounds = true
         $0.layer.cornerRadius = 12
         $0.textColor = .black
+        $0.numberOfLines = 0
     }
     
     override func configureHierarchy() {
@@ -24,7 +26,8 @@ final class MyChatTableViewCell: BaseTableViewCell {
     override func setConstraints() {
         text.snp.makeConstraints { make in
             make.top.equalTo(contentView).offset(2)
-            make.trailing.equalTo(contentView).offset(-10)
+            make.leading.greaterThanOrEqualTo(contentView).offset(20)
+            make.trailing.equalTo(contentView).offset(-20)
             make.centerY.equalTo(contentView)
             make.bottom.equalTo(contentView).offset(-2)
         }
