@@ -11,7 +11,7 @@ import Alamofire
 enum ChattingRouter {
     case createChatRoom(query: CreateChatQuery)
     case fetchAllChatList
-    case sendChat(roomId: String, content: String)
+    case sendChat(roomId: String, content: SendChatQuery)
     case fetchChat(roomId: String)
 }
 
@@ -81,9 +81,9 @@ extension ChattingRouter: RouterType {
             return try? encoder.encode(query)
         case .fetchAllChatList:
             return nil
-        case .sendChat(_, let content):
+        case .sendChat(_, let query):
             let encoder = JSONEncoder()
-            return try? encoder.encode(content)
+            return try? encoder.encode(query)
         case .fetchChat:
             return nil
         }

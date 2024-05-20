@@ -57,3 +57,7 @@ struct CreateChatQuery: HTTPBodyProtocol {
         case opponentId = "opponent_id"
     }
 }
+
+struct SendChatQuery: HTTPBodyProtocol {
+    let content: String
+}

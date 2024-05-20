@@ -14,6 +14,7 @@ final class PostDetailViewController: BaseViewController {
     let mainView = PostDetailView()
     let viewModel: PostDetailViewModel
     let viewDidLoadTrigger = PublishRelay<Void>()
+    let chatButton = UIBarButtonItem()
     
     init(viewModel: PostDetailViewModel) {
         self.viewModel = viewModel
@@ -26,7 +27,7 @@ final class PostDetailViewController: BaseViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        setNavigationBackButton(title: "")
+        setNavigationBar()
         viewDidLoadTrigger.accept(())
     }
 
@@ -34,7 +35,8 @@ final class PostDetailViewController: BaseViewController {
         
         let input = PostDetailViewModel.Input(
             viewDidLoadTrigger: viewDidLoadTrigger.asObservable(),
-            joinButtonTapped: mainView.joinButton.rx.tap.asObservable()
+            joinButtonTapped: mainView.joinButton.rx.tap.asObservable(),
+            chatButtonTapped: chatButton.rx.tap.asObservable()
         )
         
         let output = viewModel.transform(input: input)
@@ -79,6 +81,21 @@ final class PostDetailViewController: BaseViewController {
                 }
             }
             .disposed(by: disposeBag)
+        
+        output.navigateToChatView
+            .drive(with: self) { owner, roomId in
+                let chatViewModel = DetailChatViewModel(roomId: roomId)
+                let chatView = DetailChatViewController(viewModel: chatViewModel)
+                owner.navigationController?.pushViewController(chatView, animated: true)
+            }
+            .disposed(by: disposeBag)
 
     }
+    
+    private func setNavigationBar() {
+        setNavigationBackButton(title: "")
+        chatButton.title = "채팅하기"
+        navigationItem.rightBarButtonItem = chatButton
+    }
+    
 }

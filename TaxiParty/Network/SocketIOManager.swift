@@ -16,15 +16,16 @@ final class SocketIOManager {
     
     var manager: SocketManager!
     var socket: SocketIOClient!
+    let baseURL = URL(string: "\(APIKey.baseURL.rawValue)/v1")!
     
-    var receivedChatData = PublishRelay<ChatModel>()
-    var roomId: String!
+    var receivedChatData = PublishSubject<ChatModel>()
     
-    init() {
-        
-        manager = SocketManager(socketURL: URL(string: APIKey.baseURL.rawValue + "/v1")!, config: [.log(true), .compress])
-        socket = manager.socket(forNamespace: "/chats-\(roomId)")
-        
+    init() { }
+    
+    private func configureSocket(roomId: String) {
+        manager = SocketManager(socketURL: baseURL, config: [.log(true), .compress])
+        socket = manager.socket(forNamespace: "/chats-" + "\(roomId)")
+
         socket.on(clientEvent: .connect) { data, ack in
             print("SOCKET IS CONNECTED", data, ack)
         }
@@ -35,10 +36,19 @@ final class SocketIOManager {
         
         socket.on("chat") { dataArray, ack in
             print(dataArray)
+            if let data = dataArray.first, let jsonData = try? JSONSerialization.data(withJSONObject: data) {
+                    do {
+                        let decodedData = try JSONDecoder().decode(ChatModel.self, from: jsonData)
+                        self.receivedChatData.onNext(decodedData)
+                    } catch {
+                        print("Decoding error: \(error)")
+                    }
+                }
         }
     }
     
-    func establishConnection() {
+    func establishConnection(roomId: String) {
+        configureSocket(roomId: roomId)
         socket.connect()
     }
     

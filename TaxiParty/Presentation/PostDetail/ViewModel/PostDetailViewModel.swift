@@ -21,6 +21,7 @@ final class PostDetailViewModel: ViewModelProtocol {
     struct Input {
         let viewDidLoadTrigger: Observable<Void>
         let joinButtonTapped: Observable<Void>
+        let chatButtonTapped: Observable<Void>
     }
     
     struct Output {
@@ -32,6 +33,7 @@ final class PostDetailViewModel: ViewModelProtocol {
         let joinStatus: Driver<Bool>
         let enableButton: Driver<Bool>
         let availableJoin: Driver<Bool>
+        let navigateToChatView: Driver<String>
     }
     
     func transform(input: Input) -> Output {
@@ -45,6 +47,7 @@ final class PostDetailViewModel: ViewModelProtocol {
         let refreshPostTrigger = PublishRelay<Void>()
         let enableButton = PublishRelay<Bool>()
         let availableJoin = PublishRelay<Bool>()
+        let navigateToChatView = PublishRelay<String>()
         
         input.viewDidLoadTrigger
             .withLatestFrom(item)
@@ -126,6 +129,23 @@ final class PostDetailViewModel: ViewModelProtocol {
             }
             .disposed(by: disposeBag)
         
+        input.chatButtonTapped
+            .map { self.postItem }
+            .flatMap { item in
+                let query = CreateChatQuery(opponentId: item.creator.user_id)
+                return NetworkManager.shared.callRequest(type: CreateChatModel.self, router: .chattingRouter(.createChatRoom(query: query)))
+            }
+            .bind(with: self) { owner, response in
+                switch response {
+                case .success(let success):
+                    print(success)
+                    navigateToChatView.accept(success.room_id)
+                case .failure(let error):
+                    print(error)
+                }
+            }
+            .disposed(by: disposeBag)
+        
         
         return Output(
             item: item.asDriver(onErrorJustReturn: Post(postId: "", title: "", startPlaceData: "", destinationData: "", numberOfPeople: "", dueDate: "", productId: "", createdAt: "", creator: Creator(user_id: "", nick: "", profileImage: ""), together: [])),
@@ -135,7 +155,8 @@ final class PostDetailViewModel: ViewModelProtocol {
             joinPeopleNum: JoinPeopleNum.asDriver(onErrorJustReturn: 0),
             joinStatus: joinStatus.asDriver(onErrorJustReturn: false),
             enableButton: enableButton.asDriver(onErrorJustReturn: true),
-            availableJoin: availableJoin.asDriver(onErrorJustReturn: true)
+            availableJoin: availableJoin.asDriver(onErrorJustReturn: true), 
+            navigateToChatView: navigateToChatView.asDriver(onErrorJustReturn: "")
         )
     }
     
