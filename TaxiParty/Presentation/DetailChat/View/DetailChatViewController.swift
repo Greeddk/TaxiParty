@@ -38,20 +38,21 @@ final class DetailChatViewController: BaseViewController {
             viewDidLoadTrigger: viewDidLoadTrigger.asObservable(),
             sendText: mainView.textField.rx.text.orEmpty.asObservable(),
             sendButtonTapped: mainView.sendButton.rx.tap.asObservable(),
-            enterTapped: mainView.textField.rx.controlEvent(.editingDidEndOnExit).asObservable()
+            enterTapped: mainView.textField.rx.controlEvent(.editingDidEnd).asObservable(),
+            textFieldTapped: mainView.textField.rx.controlEvent(.touchDown).asObservable()
         )
         
         let output = viewModel.transform(input: input)
         
         output.outputMessages
             .drive(mainView.tableView.rx.items) { tableView, row, item in
-                if item.isMe {
+                if item.chatModel.isMe {
                     let cell = tableView.dequeueReusableCell(withIdentifier: MyChatTableViewCell.identifier) as! MyChatTableViewCell
-                    cell.text.text = item.content
+                    cell.configureCell(item: item)
                     return cell
                 } else {
                     let cell = tableView.dequeueReusableCell(withIdentifier: OpponentChatTableViewCell.identifier) as! OpponentChatTableViewCell
-                    cell.text.text = item.content
+                    cell.configureCell(item: item)
                     return cell
                 }
             }

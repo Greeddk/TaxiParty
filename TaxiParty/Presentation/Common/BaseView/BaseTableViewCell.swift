@@ -26,5 +26,18 @@ class BaseTableViewCell: UITableViewCell {
     func configureView() { }
     
     func setConstraints() { }
-
+    
+    func convertToTextDateFormat(_ dateString: String) -> String? {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+        dateFormatter.timeZone = TimeZone(abbreviation: "UTC")
+        let date = dateFormatter.date(from: dateString)
+        
+        let outputFormatter = DateFormatter()
+        outputFormatter.locale = Locale(identifier: "ko_KR")
+        outputFormatter.dateFormat = "a h시 mm분"
+        
+        return outputFormatter.string(from: date ?? Date())
+    }
+    
 }

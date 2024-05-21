@@ -27,3 +27,15 @@ struct Sender: Decodable {
         case profileImage
     }
 }
+
+struct ChatInfo {
+    let chatModel: ChatModel
+    var isContinuous: Bool
+    var isSameTime: Bool
+}
+
+extension ChatModel {
+    func toChatInfo() -> ChatInfo {
+        return ChatInfo(chatModel: self, isContinuous: false, isSameTime: false)
+    }
+}

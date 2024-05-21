@@ -49,6 +49,7 @@ final class DetailChatView: BaseView {
     
     override func setupAttributes() {
         tableView.separatorStyle = .none
+        tableView.allowsSelection = false
     }
-
+    
 }
