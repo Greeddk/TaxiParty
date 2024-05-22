@@ -8,11 +8,19 @@
 import Foundation
 
 struct ChatModel: Decodable {
+    let chatId: String
     let content: String
     let createdAt: String
     let sender: Sender
     var isMe: Bool {
         return TokenManager.userId == sender.userId
+    }
+    
+    enum CodingKeys: String, CodingKey {
+        case chatId = "chat_id"
+        case content
+        case createdAt
+        case sender
     }
 }
 

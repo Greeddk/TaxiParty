@@ -13,6 +13,7 @@ final class DetailChatViewModel {
     
     let disposeBag = DisposeBag()
     private var roomId: String!
+    private let repository = ChatRepository()
     
     init(roomId: String) {
         self.roomId = roomId
@@ -41,6 +42,24 @@ final class DetailChatViewModel {
         
         let viewDidLoadTrigger = input.viewDidLoadTrigger
             .withLatestFrom(roomIdSubject)
+        
+        viewDidLoadTrigger
+            .flatMap { id in
+                return NetworkManager.shared.callRequest(type: ChatListModel.self, router: .chattingRouter(.fetchChat(roomId: id ?? "")))
+            }
+            .bind(with: self) { owner, response in
+                switch response {
+                case .success(let success):
+                    print(success)
+                    success.data.forEach { item in
+                        messages.append(item.toChatInfo())
+                    }
+                    outputMessages.accept(messages)
+                case .failure(let error):
+                    print(error)
+                }
+            }
+            .disposed(by: disposeBag)
         
         viewDidLoadTrigger
             .bind(with: self) { owner, id in
