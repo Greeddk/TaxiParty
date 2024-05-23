@@ -8,8 +8,37 @@
 import Foundation
 import RealmSwift
 
+final class RealmChatInfoModel: Object {
+    @Persisted(primaryKey: true) var id: ObjectId
+    @Persisted var chatModel: RealmChatModel?
+    @Persisted var isContinuous: Bool
+    @Persisted var isSameTime: Bool
+    
+    convenience init(chatModel: RealmChatModel? = nil, isContinuous: Bool, isSameTime: Bool) {
+        self.init()
+        self.chatModel = chatModel
+        self.isContinuous = isContinuous
+        self.isSameTime = isSameTime
+    }
+}
+
+extension RealmChatInfoModel {
+    func toChatInfo() -> ChatInfo {
+        let item = self.chatModel
+        let chatModel = ChatModel(
+            chatId: item?.chatId ?? "",
+            content: item?.content ?? "",
+            createdAt: item?.createdAt ?? "",
+            sender: Sender(userId: item?.sender?.userId ?? "", nick: item?.sender?.nick ?? "", profileImage: item?.sender?.profileImage ?? "")
+        )
+        
+        return ChatInfo(chatModel: chatModel, isContinuous: self.isContinuous, isSameTime: self.isSameTime)
+    }
+}
+
 final class RealmChatModel: Object {
-    @Persisted(primaryKey: true) var chatId: String
+    @Persisted(primaryKey: true) var id: ObjectId
+    @Persisted var chatId: String
     @Persisted var content: String
     @Persisted var createdAt: String
     @Persisted var sender: RealmChatSender?
@@ -25,8 +54,8 @@ final class RealmChatModel: Object {
     }
 }
 
-final class RealmChatSender: Object {
-    @Persisted(primaryKey: true) var userId: String
+final class RealmChatSender: EmbeddedObject {
+    @Persisted var userId: String
     @Persisted var nick: String
     @Persisted var profileImage: String?
     

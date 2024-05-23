@@ -12,7 +12,7 @@ enum ChattingRouter {
     case createChatRoom(query: CreateChatQuery)
     case fetchAllChatList
     case sendChat(roomId: String, content: SendChatQuery)
-    case fetchChat(roomId: String)
+    case fetchChat(roomId: String, lastDate: String)
 }
 
 extension ChattingRouter: RouterType {
@@ -42,7 +42,7 @@ extension ChattingRouter: RouterType {
             return "/v1/chats"
         case .sendChat(let roomId, _):
             return "/v1/chats/\(roomId)"
-        case .fetchChat(let roomId):
+        case .fetchChat(let roomId, _):
             return "/v1/chats/\(roomId)"
         }
     }
@@ -71,7 +71,17 @@ extension ChattingRouter: RouterType {
     }
     
     var queryItem: [URLQueryItem]? {
-        return nil
+        switch self {
+        case .createChatRoom(let query):
+            return nil
+        case .fetchAllChatList:
+            return nil
+        case .sendChat(let roomId, let content):
+            return nil
+        case .fetchChat(_, let lastDate):
+            let queryItem = [URLQueryItem(name: "cursor_date", value: lastDate)]
+            return queryItem
+        }
     }
     
     var body: Data? {

@@ -35,7 +35,6 @@ final class SocketIOManager {
         }
         
         socket.on("chat") { dataArray, ack in
-            print(dataArray)
             if let data = dataArray.first, let jsonData = try? JSONSerialization.data(withJSONObject: data) {
                     do {
                         let decodedData = try JSONDecoder().decode(ChatModel.self, from: jsonData)

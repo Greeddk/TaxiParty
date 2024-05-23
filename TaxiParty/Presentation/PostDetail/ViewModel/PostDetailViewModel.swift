@@ -13,6 +13,7 @@ final class PostDetailViewModel: ViewModelProtocol {
     
     var disposeBag = DisposeBag()
     private var postItem: Post
+    private let repository = ChatRepository()
     
     init(postItem: Post) {
         self.postItem = postItem
@@ -139,6 +140,9 @@ final class PostDetailViewModel: ViewModelProtocol {
                 switch response {
                 case .success(let success):
                     print(success)
+                    if owner.repository.fetchChatList(id: success.room_id).count == 0 {
+                        owner.repository.createChatRoom(item: success)
+                    }
                     navigateToChatView.accept(success.room_id)
                 case .failure(let error):
                     print(error)

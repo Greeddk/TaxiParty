@@ -12,9 +12,9 @@ final class RealmChatRoomModel: Object {
     @Persisted(primaryKey: true) var roomId: String
     @Persisted var createdAt: String
     @Persisted var updateAt: String
-    @Persisted var chatArray: List<RealmChatModel>
+    @Persisted var chatArray: List<RealmChatInfoModel>
     
-    convenience init(roomId: String, createdAt: String, updateAt: String, chatArray: List<RealmChatModel>) {
+    convenience init(roomId: String, createdAt: String, updateAt: String, chatArray: List<RealmChatInfoModel>) {
         self.init()
         self.roomId = roomId
         self.createdAt = createdAt
