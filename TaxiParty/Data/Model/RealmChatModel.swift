@@ -37,8 +37,7 @@ extension RealmChatInfoModel {
 }
 
 final class RealmChatModel: Object {
-    @Persisted(primaryKey: true) var id: ObjectId
-    @Persisted var chatId: String
+    @Persisted(primaryKey: true) var chatId: String
     @Persisted var content: String
     @Persisted var createdAt: String
     @Persisted var sender: RealmChatSender?

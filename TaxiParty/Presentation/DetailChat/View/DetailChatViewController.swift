@@ -12,9 +12,10 @@ import RxCocoa
 final class DetailChatViewController: BaseViewController {
     
     let mainView = DetailChatView()
-    let viewModel: DetailChatViewModel
+    private let viewModel: DetailChatViewModel
     
     let viewDidLoadTrigger = PublishRelay<Void>()
+    let viewDidDisappearTrigger = PublishRelay<Void>()
     
     init(viewModel: DetailChatViewModel) {
         self.viewModel = viewModel
@@ -32,6 +33,11 @@ final class DetailChatViewController: BaseViewController {
         setNavigationBackButton(title: "채팅")
     }
     
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        viewDidDisappearTrigger.accept(())
+    }
+    
     override func bind() {
         
         let input = DetailChatViewModel.Input(
@@ -39,7 +45,8 @@ final class DetailChatViewController: BaseViewController {
             sendText: mainView.textField.rx.text.orEmpty.asObservable(),
             sendButtonTapped: mainView.sendButton.rx.tap.asObservable(),
             enterTapped: mainView.textField.rx.controlEvent(.editingDidEnd).asObservable(),
-            textFieldTapped: mainView.textField.rx.controlEvent(.touchDown).asObservable()
+            textFieldTapped: mainView.textField.rx.controlEvent(.touchDown).asObservable(),
+            viewDidDisappearTrigger: viewDidDisappearTrigger.asObservable()
         )
         
         let output = viewModel.transform(input: input)
@@ -54,6 +61,14 @@ final class DetailChatViewController: BaseViewController {
                     let cell = tableView.dequeueReusableCell(withIdentifier: OpponentChatTableViewCell.identifier) as! OpponentChatTableViewCell
                     cell.configureCell(item: item)
                     return cell
+                }
+            }
+            .disposed(by: disposeBag)
+        
+        output.scrollToBottomTrigger
+            .drive(with: self) { owner, index in
+                if index > 0 {
+                    owner.mainView.tableView.scrollToRow(at: IndexPath(row: index - 1, section: 0), at: .bottom, animated: true)
                 }
             }
             .disposed(by: disposeBag)

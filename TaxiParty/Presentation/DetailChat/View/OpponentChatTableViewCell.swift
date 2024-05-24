@@ -67,12 +67,17 @@ final class OpponentChatTableViewCell: BaseTableViewCell {
         
         if !item.isContinuous {
             nickname.text = item.chatModel.sender.nick
+            
+            if item.chatModel.sender.profileImage == "" {
+                opponentImage.image = UIImage(named: "defaultProfile")
+            }
+            
             guard let url = URL(string: APIKey.baseURL.rawValue + "/v1/" +  (item.chatModel.sender.profileImage ?? "default")) else { return }
             let options: KingfisherOptionsInfo = [
                 .requestModifier(ImageDownloadRequest())
             ]
             opponentImage.kf.setImage(with: url, options: options)
-            if url.absoluteString == APIKey.baseURL.rawValue + "/v1/" + "default" {
+            if url.absoluteString == APIKey.baseURL.rawValue + "/v1/" + "default" || item.chatModel.sender.profileImage == "" {
                 opponentImage.image = UIImage(named: "defaultProfile")
             }
         } else {

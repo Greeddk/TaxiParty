@@ -140,7 +140,7 @@ final class PostDetailViewModel: ViewModelProtocol {
                 switch response {
                 case .success(let success):
                     print(success)
-                    if owner.repository.fetchChatList(id: success.room_id).count == 0 {
+                    if !owner.repository.checkRoomExist(id: success.room_id) {
                         owner.repository.createChatRoom(item: success)
                     }
                     navigateToChatView.accept(success.room_id)

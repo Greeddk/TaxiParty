@@ -9,14 +9,20 @@ import Foundation
 import RxSwift
 import RxCocoa
 
-final class DetailChatViewModel {
+final class DetailChatViewModel: ViewModelProtocol {
     
-    let disposeBag = DisposeBag()
+    var disposeBag = DisposeBag()
     private var roomId: String!
     private let repository = ChatRepository()
+    private let socket = SocketIOManager.shared
     
     init(roomId: String) {
         self.roomId = roomId
+    }
+    
+    deinit {
+        print("-----------------------------------")
+        print("deinit")
     }
     
     struct Input {
@@ -25,31 +31,29 @@ final class DetailChatViewModel {
         let sendButtonTapped: Observable<Void>
         let enterTapped: Observable<Void>
         let textFieldTapped: Observable<Void>
+        let viewDidDisappearTrigger: Observable<Void>
     }
     
     struct Output {
         let outputMessages: Driver<[ChatInfo]>
         let removeTextTrigger: Driver<Void>
         let textFieldTapped: Driver<Void>
+        let scrollToBottomTrigger: Driver<Int>
     }
     
     func transform(input: Input) -> Output {
         
-        let roomIdSubject = BehaviorSubject(value: roomId)
         var messages: [ChatInfo] = []
         let outputMessages = PublishRelay<[ChatInfo]>()
         let removeTextTrigger = PublishRelay<Void>()
         let fetchRecentDataTrigger = PublishRelay<Void>()
         let connetSocketTrigger = PublishRelay<Void>()
+        let scrollToBottomTrigger = PublishRelay<Int>()
         
-        let viewDidLoadTrigger = input.viewDidLoadTrigger
-            .withLatestFrom(roomIdSubject)
-        
-        viewDidLoadTrigger
-            .bind(with: self) { owner, id in
+        input.viewDidLoadTrigger
+            .bind(with: self) { owner, _ in
                 let loadMessages = owner.repository.fetchChatList(id: owner.roomId)
                 loadMessages.forEach { item in
-                    guard let item = item else { return }
                     messages.append(item.toChatInfo())
                 }
                 outputMessages.accept(messages)
@@ -58,19 +62,22 @@ final class DetailChatViewModel {
             .disposed(by: disposeBag)
         
         fetchRecentDataTrigger
-            .flatMap {
-                let lastChatInfo = self.repository.fetchChatList(id: self.roomId).last
-                let lastDate = lastChatInfo??.chatModel?.createdAt
-                return NetworkManager.shared.callRequest(type: ChatListModel.self, router: .chattingRouter(.fetchChat(roomId: self.roomId, lastDate: lastDate ?? "")))
+            .flatMap { [weak self] in
+                let lastDate = self?.repository.fetchLastChat(id: self?.roomId ?? "") ?? ""
+                return NetworkManager.shared.callRequest(type: ChatListModel.self, router: .chattingRouter(.fetchChat(roomId: self?.roomId ?? "", lastDate: lastDate)))
             }
-            .bind(with: self) { owner, response in
+            .subscribe(with: self) { owner, response in
                 switch response {
                 case .success(let success):
                     print(success)
-                    success.data.forEach { item in
-                        messages.append(item.toChatInfo())
+                    for item in success.data {
+                        let chatInfo = item.toChatInfo()
+                        messages.append(chatInfo)
+                        owner.repository.appendChatList(id: owner.roomId, chat: chatInfo)
+                        messages = owner.updateInfo(messages: messages, chatModel: item)
                     }
                     outputMessages.accept(messages)
+                    scrollToBottomTrigger.accept(messages.count)
                     connetSocketTrigger.accept(())
                 case .failure(let error):
                     print(error)
@@ -80,29 +87,19 @@ final class DetailChatViewModel {
         
         connetSocketTrigger
             .bind(with: self) { owner, _ in
-                SocketIOManager.shared.establishConnection(roomId: owner.roomId)
+                owner.socket.establishConnection(roomId: owner.roomId)
             }
             .disposed(by: disposeBag)
         
-        SocketIOManager.shared.receivedChatData
-            .bind(with: self) { owner, chatModel in
+        socket.receivedChatData
+            .subscribe(with: self) { owner, chatModel in
                 let chatInfo = chatModel.toChatInfo()
                 messages.append(chatInfo)
                 owner.repository.appendChatList(id: owner.roomId, chat: chatInfo)
-                
-                if messages.count > 1 && messages[messages.count - 2].chatModel.sender.userId == chatModel.sender.userId {
-                    messages[messages.count - 1].isContinuous = true
-                    owner.repository.updateChatInfo(index: messages.count - 1, id: owner.roomId, isContinuous: true, isSameTime: nil)
-                    
-                    if messages.count > 1 && self.convertToTextDateFormat(messages[messages.count - 2].chatModel.createdAt) == self.convertToTextDateFormat(chatModel.createdAt) {
-                        messages[messages.count - 2].isSameTime = true
-                        owner.repository.updateChatInfo(index: messages.count - 2, id: owner.roomId, isContinuous: nil, isSameTime: true)
-                    }
-                }
+                messages = owner.updateInfo(messages: messages, chatModel: chatModel)
                 outputMessages.accept(messages)
             }
             .disposed(by: disposeBag)
-        
         
         Observable.merge(input.sendButtonTapped, input.enterTapped)
             .throttle(.seconds(1), scheduler: MainScheduler())
@@ -121,10 +118,19 @@ final class DetailChatViewModel {
             }
             .disposed(by: disposeBag)
         
+        input.viewDidDisappearTrigger
+            .bind(with: self) { owner, _ in
+                owner.socket.leaveConnection()
+            }
+            .disposed(by: disposeBag)
+        
         return Output(
             outputMessages: outputMessages.asDriver(onErrorJustReturn: []),
             removeTextTrigger: removeTextTrigger.asDriver(onErrorJustReturn: ()),
-            textFieldTapped: input.textFieldTapped.asDriver(onErrorJustReturn: ()))
+            textFieldTapped: input.textFieldTapped.asDriver(onErrorJustReturn: ()),
+            scrollToBottomTrigger: scrollToBottomTrigger.asDriver(onErrorJustReturn: 0)
+        )
+        
     }
     
 }
@@ -143,5 +149,28 @@ extension DetailChatViewModel {
         
         return outputFormatter.string(from: date ?? Date())
     }
+    
+    private func updateInfo(messages: [ChatInfo], chatModel: ChatModel) -> [ChatInfo] {
+        var updatedMessages = messages
+        
+        guard updatedMessages.count > 1 else { return updatedMessages }
+        
+        let lastIndex = updatedMessages.count - 1
+        let secondLastIndex = lastIndex - 1
+        
+        if secondLastIndex >= 0, updatedMessages[secondLastIndex].chatModel.sender.userId == chatModel.sender.userId {
+            
+            updatedMessages[lastIndex].isContinuous = true
+            repository.updateChatInfo(index: lastIndex, id: roomId, isContinuous: true, isSameTime: nil)
+            
+            if convertToTextDateFormat(updatedMessages[secondLastIndex].chatModel.createdAt) == convertToTextDateFormat(chatModel.createdAt) {
+                updatedMessages[secondLastIndex].isSameTime = true
+                repository.updateChatInfo(index: secondLastIndex, id: roomId, isContinuous: nil, isSameTime: true)
+            }
+        }
+        
+        return updatedMessages
+    }
+    
     
 }

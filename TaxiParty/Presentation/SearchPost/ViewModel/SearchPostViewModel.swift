@@ -35,7 +35,7 @@ final class SearchPostViewModel: ViewModelProtocol {
             .bind(with: self) { owner, response in
                 switch response {
                 case .success(let success):
-                    dataSource.append(contentsOf: success.data)
+                    dataSource = success.data
                     fetchedData.accept(dataSource)
                     nextCursor.accept(success.nextCursor)
                 case .failure(let error):

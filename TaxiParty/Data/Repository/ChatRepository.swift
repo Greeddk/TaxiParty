@@ -24,10 +24,13 @@ final class ChatRepository {
     }
     
     func appendChatList(id: String, chat: ChatInfo) {
-        let chatRoom = realm.objects(RealmChatRoomModel.self).filter { $0.roomId == id }
+        guard let chatRoom = realm.object(ofType: RealmChatRoomModel.self, forPrimaryKey: id) else {
+            print("채팅방이 없습니다.", #function)
+            return
+        }
         do {
             try realm.write {
-                chatRoom.first?.chatArray.append(RealmChatInfoModel(chatModel: RealmChatModel(
+                let newChat = RealmChatInfoModel(chatModel: RealmChatModel(
                     chatId: chat.chatModel.chatId,
                     content: chat.chatModel.content,
                     createdAt: chat.chatModel.createdAt,
@@ -36,7 +39,8 @@ final class ChatRepository {
                         nick: chat.chatModel.sender.nick,
                         profileImage: chat.chatModel.sender.profileImage ?? nil), files: List()),
                     isContinuous: chat.isContinuous,
-                    isSameTime: chat.isSameTime))
+                    isSameTime: chat.isSameTime)
+                chatRoom.chatArray.append(newChat)
             }
         } catch {
             print("realm saveChat error")
@@ -44,7 +48,7 @@ final class ChatRepository {
     }
     
     func updateChatInfo(index: Int, id: String, isContinuous: Bool?, isSameTime: Bool?) {
-        guard let chatRoom = realm.objects(RealmChatRoomModel.self).filter({ $0.roomId == id }).first else {
+        guard let chatRoom = realm.object(ofType: RealmChatRoomModel.self, forPrimaryKey: id) else {
             print("채팅방을 찾을 수 없습니다")
             return
         }
@@ -66,10 +70,24 @@ final class ChatRepository {
     }
 
     
-    func fetchChatList(id: String) -> [RealmChatInfoModel?] {
-        let chatRoom = realm.objects(RealmChatRoomModel.self).filter { $0.roomId == id }
-        let chatArray = chatRoom.first?.chatArray ?? List()
+    func fetchChatList(id: String) -> [RealmChatInfoModel] {
+        let chatRoom = realm.object(ofType: RealmChatRoomModel.self, forPrimaryKey: id)
+        let chatArray = chatRoom?.chatArray ?? List()
         return Array(chatArray)
+    }
+    
+    func checkRoomExist(id: String) -> Bool {
+        let chatRoom = realm.object(ofType: RealmChatRoomModel.self, forPrimaryKey: id)
+        if chatRoom == nil {
+            return false
+        }
+        return true
+    }
+    
+    func fetchLastChat(id: String) -> String {
+        let lastChatInfo = fetchChatList(id: id)
+        guard let lastDate = lastChatInfo.last?.chatModel?.createdAt else { return ""}
+        return lastDate
     }
     
 }
