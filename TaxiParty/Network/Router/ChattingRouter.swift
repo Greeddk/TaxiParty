@@ -72,11 +72,11 @@ extension ChattingRouter: RouterType {
     
     var queryItem: [URLQueryItem]? {
         switch self {
-        case .createChatRoom(let query):
+        case .createChatRoom:
             return nil
         case .fetchAllChatList:
             return nil
-        case .sendChat(let roomId, let content):
+        case .sendChat:
             return nil
         case .fetchChat(_, let lastDate):
             let queryItem = [URLQueryItem(name: "cursor_date", value: lastDate)]

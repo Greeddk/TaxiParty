@@ -5,6 +5,7 @@ target 'TaxiParty' do
   # Comment the next line if you don't want to use dynamic frameworks
   pod 'NMapsMap'
   pod "RxGesture"
+  pod 'RxDataSources'
   # Pods for FindMiddlePoint
 
 end

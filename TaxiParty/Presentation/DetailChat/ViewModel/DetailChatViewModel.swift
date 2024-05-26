@@ -20,11 +20,6 @@ final class DetailChatViewModel: ViewModelProtocol {
         self.roomId = roomId
     }
     
-    deinit {
-        print("-----------------------------------")
-        print("deinit")
-    }
-    
     struct Input {
         let viewDidLoadTrigger: Observable<Void>
         let sendText: Observable<String>
@@ -62,9 +57,10 @@ final class DetailChatViewModel: ViewModelProtocol {
             .disposed(by: disposeBag)
         
         fetchRecentDataTrigger
-            .flatMap { [weak self] in
-                let lastDate = self?.repository.fetchLastChat(id: self?.roomId ?? "") ?? ""
-                return NetworkManager.shared.callRequest(type: ChatListModel.self, router: .chattingRouter(.fetchChat(roomId: self?.roomId ?? "", lastDate: lastDate)))
+            .withUnretained(self)
+            .flatMap { owner, _ in
+                let lastDate = owner.repository.fetchLastChat(id: owner.roomId)
+                return NetworkManager.shared.callRequest(type: ChatListModel.self, router: .chattingRouter(.fetchChat(roomId: owner.roomId, lastDate: lastDate)))
             }
             .subscribe(with: self) { owner, response in
                 switch response {

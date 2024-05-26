@@ -56,6 +56,7 @@ final class ChatRepository {
         do {
             try realm.write {
                 let chatInfo = chatRoom.chatArray[index]
+                chatRoom.updateAt = chatInfo.chatModel?.createdAt ?? ""
                 
                 if let isContinuous = isContinuous {
                     chatInfo.isContinuous = isContinuous
@@ -88,6 +89,22 @@ final class ChatRepository {
         let lastChatInfo = fetchChatList(id: id)
         guard let lastDate = lastChatInfo.last?.chatModel?.createdAt else { return ""}
         return lastDate
+    }
+    
+    func fetchChatRoomList() -> [ChatRoomCellInfoModel] {
+        let chatRoomList = realm.objects(RealmChatRoomModel.self)
+            .sorted(byKeyPath: "updateAt")
+            .filter {
+            $0.chatArray.count > 0
+        }
+        var chatRoomCellInfoList: [ChatRoomCellInfoModel] = []
+        for item in chatRoomList {
+            guard let lastChat = item.chatArray.last?.toChatInfo() else { return [] }
+            let newItem = ChatRoomCellInfoModel(roomId: item.roomId, sender: lastChat.chatModel.sender, lastContent: lastChat.chatModel.content, lastDate: lastChat.chatModel.createdAt, unreadCount: 0)
+            chatRoomCellInfoList.append(newItem)
+        }
+
+        return Array(chatRoomCellInfoList)
     }
     
 }

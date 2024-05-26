@@ -7,6 +7,9 @@
 
 import UIKit
 import SwiftUI
+import RxSwift
+import RxCocoa
+import RxDataSources
 
 struct ChatListRepresentableView: UIViewControllerRepresentable {
 
@@ -21,10 +24,77 @@ struct ChatListRepresentableView: UIViewControllerRepresentable {
 }
 
 final class ChatListViewController: BaseViewController {
+    
+    let mainView = ChatListView()
+    let viewModel = ChatListViewModel()
+    let viewDidLoadTrigger = PublishRelay<Void>()
+    
+    override func loadView() {
+        self.view = mainView
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        viewDidLoadTrigger.accept(())
+    }
+    
+    override func bind() {
+        
+        let dataSoruce = RxTableViewSectionedAnimatedDataSource<ChatRoomListData>( animationConfiguration: AnimationConfiguration(
+            insertAnimation: .fade,
+            reloadAnimation: .fade,
+            deleteAnimation: .fade
+        )
+        ) { data, tableView, indexPath, item in
+            guard let cell = tableView.dequeueReusableCell(withIdentifier: ChatRoomTableViewCell.identifier, for: indexPath) as? ChatRoomTableViewCell else { return UITableViewCell() }
+            cell.configureCell(item: item)
+            return cell
+        }
+        
+        let input = ChatListViewModel.Input(viewDidLoadTrigger: viewDidLoadTrigger.asObservable())
+        
+        let output = viewModel.transform(input: input)
+        
+        output.chatRoomList
+            .drive(mainView.tableView.rx.items(dataSource: dataSoruce))
+            .disposed(by: disposeBag)
+        
     }
 
+}
+
+struct ChatRoomListData {
+    var header: String
+    var items: [Item]
+}
+
+extension ChatRoomListData: AnimatableSectionModelType {
+    typealias Item = ChatRoomCellInfoModel
+    
+    var identity: String {
+        return header
+    }
+    
+    init(original: ChatRoomListData, items: [ChatRoomCellInfoModel]) {
+        self = original
+        self.items = items
+    }
+}
+
+struct ChatRoomCellInfoModel {
+    let roomId: String
+    let sender: Sender
+    var lastContent: String
+    var lastDate: String
+    var unreadCount: Int
+}
+
+extension ChatRoomCellInfoModel: IdentifiableType, Equatable {
+    static func == (lhs: ChatRoomCellInfoModel, rhs: ChatRoomCellInfoModel) -> Bool {
+        return lhs.identity == rhs.identity
+    }
+    
+    var identity: String {
+        return roomId
+    }
 }

@@ -51,7 +51,7 @@ extension GeocodingRouter: RouterType {
             return "/v2/local/search/keyword"
         case .getCoord:
             return "/map-geocode/v2/geocode"
-        case .fetchDirection(query: let query):
+        case .fetchDirection:
             return "/map-direction/v1/driving"
         }
     }
