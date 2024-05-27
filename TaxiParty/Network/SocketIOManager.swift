@@ -53,8 +53,8 @@ final class SocketIOManager {
     
     func leaveConnection() {
         socket.disconnect()
-        socket = nil
-        manager = nil
+//        socket = nil
+//        manager = nil
     }
     
 }

@@ -12,6 +12,11 @@ struct CreateChatModel: Decodable {
     let createdAt: String
     let updatedAt: String
     let participants: [Participants]
+    var opponent: Participants {
+        return participants.filter { user in
+            user.user_id != TokenManager.userId
+        }.first ?? Participants(user_id: "", nick: "", profileImage: "")
+    }
 }
 
 struct Participants: Decodable {

@@ -40,4 +40,41 @@ class BaseTableViewCell: UITableViewCell {
         return outputFormatter.string(from: date ?? Date())
     }
     
+    func convertToLastDateFormat(_ dateString: String) -> String? {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+        dateFormatter.timeZone = TimeZone(abbreviation: "UTC")
+        guard let date = dateFormatter.date(from: dateString) else {
+            return nil
+        }
+        
+        let calendar = Calendar.current
+        let now = Date()
+        
+        if calendar.isDateInToday(date) {
+            let outputFormatter = DateFormatter()
+            outputFormatter.locale = Locale(identifier: "ko_KR")
+            outputFormatter.dateFormat = "a h시 mm분"
+            return outputFormatter.string(from: date)
+        }
+        
+        if calendar.isDateInYesterday(date) {
+            return "어제"
+        }
+        
+        let currentYear = calendar.component(.year, from: now)
+        let dateYear = calendar.component(.year, from: date)
+        
+        let outputFormatter = DateFormatter()
+        outputFormatter.locale = Locale(identifier: "ko_KR")
+        
+        if currentYear == dateYear {
+            outputFormatter.dateFormat = "M월 d일"
+        } else {
+            outputFormatter.dateFormat = "yyyy. MM. dd."
+        }
+        
+        return outputFormatter.string(from: date)
+    }
+    
 }

@@ -13,7 +13,7 @@ final class ChatRepository {
     private let realm = try! Realm()
     
     func createChatRoom(item: CreateChatModel) {
-        let chatRoom = RealmChatRoomModel(roomId: item.room_id, createdAt: item.createdAt, updateAt: item.updatedAt, chatArray: List())
+        let chatRoom = RealmChatRoomModel(roomId: item.room_id, createdAt: item.createdAt, updateAt: item.updatedAt, chatArray: List(), opponent: item.opponent)
         do {
             try realm.write {
                 realm.add(chatRoom)
@@ -93,14 +93,14 @@ final class ChatRepository {
     
     func fetchChatRoomList() -> [ChatRoomCellInfoModel] {
         let chatRoomList = realm.objects(RealmChatRoomModel.self)
-            .sorted(byKeyPath: "updateAt")
+            .sorted(byKeyPath: "updateAt", ascending: false)
             .filter {
             $0.chatArray.count > 0
         }
         var chatRoomCellInfoList: [ChatRoomCellInfoModel] = []
         for item in chatRoomList {
             guard let lastChat = item.chatArray.last?.toChatInfo() else { return [] }
-            let newItem = ChatRoomCellInfoModel(roomId: item.roomId, sender: lastChat.chatModel.sender, lastContent: lastChat.chatModel.content, lastDate: lastChat.chatModel.createdAt, unreadCount: 0)
+            let newItem = ChatRoomCellInfoModel(roomId: item.roomId, opponent: item.opponent ?? Opponent(user_id: "", nick: ""), lastContent: lastChat.chatModel.content, lastDate: lastChat.chatModel.createdAt, unreadCount: 0)
             chatRoomCellInfoList.append(newItem)
         }
 

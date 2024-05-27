@@ -14,7 +14,7 @@ final class ChatRoomTableViewCell: BaseTableViewCell {
 
     let profileImage = UIImageView().then {
         $0.clipsToBounds = true
-        $0.layer.cornerRadius = 12
+        $0.layer.cornerRadius = 24
         $0.image = UIImage(named: "defaultProfile")
     }
     let nickname = UILabel().then {
@@ -23,6 +23,7 @@ final class ChatRoomTableViewCell: BaseTableViewCell {
     let lastTime = UILabel().then {
         $0.font = .Spoqa(size: 10, weight: .regular)
         $0.textColor = .systemGray2
+        $0.textAlignment = .right
     }
     let lastText = UILabel().then {
         $0.font = .Spoqa(size: 12, weight: .medium)
@@ -37,8 +38,10 @@ final class ChatRoomTableViewCell: BaseTableViewCell {
     override func setConstraints() {
         profileImage.snp.makeConstraints { make in
             make.leading.equalTo(contentView).offset(16)
+            make.top.equalTo(contentView).offset(8)
+            make.bottom.equalTo(contentView).offset(-8)
             make.centerY.equalTo(contentView)
-            make.size.equalTo(32)
+            make.size.equalTo(60)
         }
         nickname.snp.makeConstraints { make in
             make.leading.equalTo(profileImage.snp.trailing).offset(8)
@@ -47,7 +50,8 @@ final class ChatRoomTableViewCell: BaseTableViewCell {
         }
         lastTime.snp.makeConstraints { make in
             make.trailing.equalTo(contentView).offset(-16)
-            make.top.equalTo(profileImage.snp.top).offset(8)
+            make.top.equalTo(profileImage.snp.top).offset(12)
+            make.width.lessThanOrEqualTo(100)
         }
         lastText.snp.makeConstraints { make in
             make.top.equalTo(nickname.snp.bottom).offset(4)
@@ -58,16 +62,16 @@ final class ChatRoomTableViewCell: BaseTableViewCell {
     }
     
     func configureCell(item: ChatRoomCellInfoModel) {
-        nickname.text = item.sender.nick
+        nickname.text = item.opponent.nick
         lastText.text = item.lastContent
-        lastTime.text = item.lastDate
+        lastTime.text = convertToLastDateFormat(item.lastDate)
         
-        guard let url = URL(string: APIKey.baseURL.rawValue + "/v1/" +  (item.sender.profileImage ?? "default")) else { return }
+        guard let url = URL(string: APIKey.baseURL.rawValue + "/v1/" +  (item.opponent.profileImage ?? "default")) else { return }
         let options: KingfisherOptionsInfo = [
             .requestModifier(ImageDownloadRequest())
         ]
         profileImage.kf.setImage(with: url, options: options)
-        if item.sender.profileImage == "" {
+        if item.opponent.profileImage == nil {
             profileImage.image = UIImage(named: "defaultProfile")
         }
     }

@@ -26,6 +26,7 @@ final class ChatListView: BaseView {
     
     override func setupAttributes() {
         tableView.register(ChatRoomTableViewCell.self, forCellReuseIdentifier: ChatRoomTableViewCell.identifier)
+        tableView.separatorStyle = .none
     }
 
 }

@@ -19,6 +19,11 @@ extension UIViewController {
         view.endEditing(true)
     }
     
+    func setNavigationTitle(_ title: String) {
+        navigationController?.isNavigationBarHidden = false
+        navigationController?.title = title
+    }
+    
     func setNavigationBackButton(title: String) {
         navigationController?.isNavigationBarHidden = false
         hideBackButton()

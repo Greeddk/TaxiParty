@@ -28,7 +28,7 @@ final class ChatListViewModel: ViewModelProtocol {
         input.viewDidLoadTrigger
             .bind(with: self) { owner, _ in
                 let list = owner.repository.fetchChatRoomList()
-                let data = ChatRoomListData(header: "", items: list)
+                let data = ChatRoomListData(header: "채팅 목록", items: list)
                 chatRoomList.onNext([data])
             }
             .disposed(by: disposeBag)

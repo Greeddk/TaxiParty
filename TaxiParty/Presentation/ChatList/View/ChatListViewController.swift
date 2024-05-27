@@ -12,7 +12,7 @@ import RxCocoa
 import RxDataSources
 
 struct ChatListRepresentableView: UIViewControllerRepresentable {
-
+    
     func makeUIViewController(context: Context) -> some UIViewController {
         ChatListViewController()
     }
@@ -32,7 +32,7 @@ final class ChatListViewController: BaseViewController {
     override func loadView() {
         self.view = mainView
     }
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         viewDidLoadTrigger.accept(())
@@ -59,8 +59,22 @@ final class ChatListViewController: BaseViewController {
             .drive(mainView.tableView.rx.items(dataSource: dataSoruce))
             .disposed(by: disposeBag)
         
+        mainView.tableView.rx.modelSelected(ChatRoomCellInfoModel.self)
+            .bind(with: self, onNext: { owner, item in
+                let chatViewModel = DetailChatViewModel(roomId: item.roomId)
+                let chatView = DetailChatViewController(viewModel: chatViewModel)
+                owner.navigationController?.pushViewController(chatView, animated: true)
+            })
+            .disposed(by: disposeBag)
+        
+        mainView.tableView.rx.itemSelected.asDriver()
+            .drive(with: self) { owner, indexPath in
+                owner.mainView.tableView.deselectRow(at: indexPath, animated: true)
+            }
+            .disposed(by: disposeBag)
+        
     }
-
+    
 }
 
 struct ChatRoomListData {
@@ -83,7 +97,7 @@ extension ChatRoomListData: AnimatableSectionModelType {
 
 struct ChatRoomCellInfoModel {
     let roomId: String
-    let sender: Sender
+    let opponent: Opponent
     var lastContent: String
     var lastDate: String
     var unreadCount: Int
