@@ -107,4 +107,14 @@ final class ChatRepository {
         return Array(chatRoomCellInfoList)
     }
     
+    func deleteAllData() {
+        do {
+            try realm.write {
+                realm.deleteAll()
+            }
+        } catch {
+            print("delete error")
+        }
+    }
+    
 }

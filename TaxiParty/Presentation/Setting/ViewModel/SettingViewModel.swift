@@ -12,6 +12,7 @@ import RxCocoa
 final class SettingViewModel: ViewModelProtocol {
     
     var disposeBag = DisposeBag()
+    let repository = ChatRepository()
     
     struct Input {
         let fetchProfile: Observable<Void>
@@ -66,6 +67,7 @@ final class SettingViewModel: ViewModelProtocol {
                 case .success(let success):
                     print(success)
                     withdrawComplete.accept(())
+                    owner.repository.deleteAllData()
                 case .failure(let error):
                     switch error {
                     case .invalidToken:
