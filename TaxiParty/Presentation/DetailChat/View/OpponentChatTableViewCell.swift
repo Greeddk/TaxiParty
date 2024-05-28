@@ -18,13 +18,7 @@ final class OpponentChatTableViewCell: BaseTableViewCell {
     let nickname = UILabel().then {
         $0.font = .Spoqa(size: 14, weight: .medium)
     }
-    let text = PaddingLabel().then {
-        $0.backgroundColor = .systemGray5
-        $0.clipsToBounds = true
-        $0.layer.cornerRadius = 12
-        $0.numberOfLines = 0
-        $0.font = .Spoqa(size: 14, weight: .medium)
-    }
+    let text = PaddingTextView(backgroundColor: .systemGray5)
     let date = UILabel().then {
         $0.font = .Spoqa(size: 8, weight: .medium)
         $0.textColor = .systemGray2
