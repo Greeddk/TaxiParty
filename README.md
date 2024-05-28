@@ -14,9 +14,10 @@
 
 # ‎‎택시팟 - 택시 합승 플랫폼
 
-## 개발 기간과 v1.0 버전 기능
+## 개발 기간과 버전별 기능
 ### 개발 기간
-- 2024.04.10 ~ 2024.05.05 (26일)
+- v1.0 2024.04.10 ~ 2024.05.06 (27일)
+- v1.1 2024.05.16 ~ 2024.05.28 (13일)
 <br>
 
 ### Configuration
@@ -45,9 +46,11 @@
  - 유저가 올린 포스트들 조회 기능
  <br>
 
- 5. 채팅 기능
+### v1.1 기능
+ 1. 채팅 기능
  - 1:1 채팅 기능
  - 기존 채팅 내역 저장 기능
+ <br>
 
 ### 기술 스택
  - UIKit / SwiftUI / MVVM input - output Pattern
@@ -66,14 +69,13 @@
 ### 1. 채팅
 
 - 사용자와 상대방의 채팅을 구분하기 위해 두가지 테이블셀 사용
-- 한 사람의 채팅을 연속적으로 했을 때, 중복되는 프로필 사진과 시간을 제거해 유저 경험 고려
-- 기존 채팅 내역을 realm에 저장해 이전 채팅도 볼 수 있게 구현
+- 유저 경험 고려해 한 사람의 채팅을 연속적으로 했을 때, 중복되는 프로필 사진과 시간을 제거
+- 이전 채팅을 읽어와서 보여줘야하는 부분을 고려해 realm에 이전 대화 내용 저장
 
 ### 2. Router들을 하나의 Enum으로 관리
 
 - 다양한 API의 EndPoint 유지보수와 가독성 측면을 고려해 Router를 관심사에 따라 분리
 - 코드를 사용할 때 실수를 방지하기 위해 열거형으로 관리
-- 편리하게 코드 작성 가능
 
 <details>
 <summary>코드 보기</summary>
@@ -155,7 +157,7 @@ enum TokenManager {
 ### 4. RxSwift
 
 - 실시간으로 상호작용하는 반응형 프로그래밍을 쉽게 적용하기 위해 RxSwift를 적용
-- 서버와 통신을 비동기로 처리하고 Driver나 MainScheduler로 편하게 스레드를 관리가 용이하기 때문에 적용
+- 서버와의 통신을 비동기로 처리하고 스레드를 관리가 용이하기 때문에 적용
 
 ### 5. NaverMap
 
@@ -238,15 +240,21 @@ final class AuthInterceptor: RequestInterceptor {
 <br>
 
 # ⚒️트러블 슈팅
- 처음 RxSwift를 적용한 프로젝트이면서 백앤드 서버를 제대로 써본 프로젝트이다. 아래는 그 문제들 중 어려웠던 문제들과 해결했던 방법을 설명해보려고 한다.
 
 ## 1. Custom Bottom Sheet의 크기 조절
 
- <img width="30%" src="https://github.com/Greeddk/TaxiParty/assets/116425551/c7a76f2b-1d0f-4a3d-b5df-a182c4a8ac05"/>
- <img width="30%" src="https://github.com/Greeddk/TaxiParty/assets/116425551/26fddf5c-4f81-4ac6-98cc-d70392484014"/>
+ <img width="20%" src="https://github.com/Greeddk/TaxiParty/assets/116425551/c7a76f2b-1d0f-4a3d-b5df-a182c4a8ac05"/>
+ <img width="20%" src="https://github.com/Greeddk/TaxiParty/assets/116425551/26fddf5c-4f81-4ac6-98cc-d70392484014"/>
 
-  어느 택시 앱과 같은 바텀시트뷰를 만들기 위해 택스트 필드를 누르면 전체화면으로 뒤로가기 버튼을 누르면 최소 크기로 바뀌게 만들고 싶었다. 기존 라이브러리로는 이와 같은 구현이 힘들어 라이브러리를 쓰지 않고 Custom Bottom Sheet View를 만들었고, 버튼과 택스트필드에 타겟을 추가하여 각 각 클릭되었을 때 크기가 바뀌게 설정하여 해결했다.
- 
+### 문제상황
+  - textField를 누르면 바텀시트가 전체화면으로, 뒤로가기 Button을 누르면 최소 크기로 변경되게 구현하고자 함
+  - 기존에 구현되어 있는 라이브러리는 바텀시트 드래그 앤 드랍을 통해 바텀시트의 크기가 변함
+
+### 해결방법
+  - Custom Sheet View로 구현
+  - Button과 textField에 타켓을 추가해 이벤트 발생 시 sheetView 크기를 동적으로 구현
+  <br>
+  
 <details>
 <summary>코드 보기</summary>
   
@@ -367,9 +375,15 @@ final class BottomSheetView: PassThroughView {
 
 ## 2. Custom Bottom Sheet의 레이아웃이 원하는대로 나타나지 않는 이슈
 
- <img width="30%" src="https://github.com/Greeddk/TaxiParty/assets/116425551/1dc474a4-cec0-4c9b-b526-f0cfc75834df"/>
+ <img width="20%" src="https://github.com/Greeddk/TaxiParty/assets/116425551/1dc474a4-cec0-4c9b-b526-f0cfc75834df"/>
 
-  바텀 시트 사이즈가 tip 일 때, 다른 뷰 객체에 밀려서 원래 원하던 뷰 레이아웃이 제대로 그려지지 않는 버그가 발생하였다. 이 부분을 해결하기 위해 사이즈가 tip일때는 보이지 않는 뷰객체들의 height을 0으로 바꾸고 사이즈가 full로 바뀔 때 Snapkit의 remake를 통해 의도한 사이즈를 다시 부여하여 제대로 레이아웃이 그려지게 설정하였다.
+### 문제상황
+  - 바텀 시트 사이즈가 tip 일 때, 원하던 레이아웃이 그려지지 않는 버그가 발생
+
+### 해결방법
+  - 바텀 시트 사이즈가 tip일때는 보이지 않는 뷰객체들의 height을 0으로 설정
+  - 사이즈가 full로 바뀔 때 Snapkit의 remake를 통해 의도한 사이즈를 재설정
+  <br>
  
 <details>
 <summary>코드 보기</summary>
@@ -433,9 +447,15 @@ func updateConstraints(isFullmode: Bool) {
 
 ## 3. 하나의 채팅이 여러번 저장되는 이슈 
 
- <img width="30%" src="https://github.com/Greeddk/TaxiParty/assets/116425551/e7bbab37-4076-4353-a8d9-59bae47c991b"/>
+ <img width="20%" src="https://github.com/Greeddk/TaxiParty/assets/116425551/e7bbab37-4076-4353-a8d9-59bae47c991b"/>
 
-  처음 채팅뷰로 이동했을 때는 채팅이 하나만 저장되지만, 나갔다가 다시 들어왔을 때는 2번 저장되고 그리고 다시 나갔다가 들어왔을 땐 3번 저장되는 버그가 발생했다. 이 버그는 뷰모델이 deinit되지 않아서 bind가 중첩되서 발생하는 버그였다. 이 부분을 해결하기 위해 클로저 내부에서 강한 순환 참조가 되지 않게 하여 bind가 중첩되는 문제를 해결했다. 
+### 문제상황
+  - 채팅 뷰를 나갔다가 다시 들어왔을 때, 동일한 채팅이 중복되어 저장되는 버그 발생
+
+### 해결방법
+  - 뷰모델이 deinit되지 않아서 bind가 중첩돼서 발생하는 버그
+  - 클로저 내부에서 강한 순환 참조가 되지 않게 하여 bind가 중첩되는 문제를 해결
+  <br>
  
 <details>
 <summary>코드 보기</summary>
